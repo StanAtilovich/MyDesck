@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/placeHolder"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".act.EditAdsActivity">
+
+    <ScrollView
+        android:id="@+id/scrollViewMine"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:onClick="onClickSelectCountry"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <androidx.viewpager2.widget.ViewPager2
+                    android:id="@+id/vpImages"
+                    android:layout_width="match_parent"
+                    android:layout_height="200dp"
+                    android:background="@android:drawable/editbox_background"
+                    android:onClick="onClickSelectCountry"
+                    android:padding="5dp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent">
+
+                </androidx.viewpager2.widget.ViewPager2>
+
+                <ImageButton
+                    android:id="@+id/imageButton2"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:onClick="onClickGetImages"
+                    android:src="@android:drawable/btn_star"
+                    app:layout_constraintEnd_toEndOf="@+id/vpImages"
+                    app:layout_constraintTop_toTopOf="@+id/vpImages" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <TextView
+                android:id="@+id/tvCountry"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="5dp"
+                android:gravity="center"
+                android:onClick="onClickSelectCountry"
+                android:padding="10dp"
+                android:text="@string/select_country"
+                android:textColor="@color/black" />
+
+            <TextView
+                android:id="@+id/tvCity"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="5dp"
+                android:gravity="center"
+                android:onClick="onClickSelectCity"
+                android:padding="10dp"
+                android:text="@string/select_city"
+                android:textColor="@color/black" />
+
+        </LinearLayout>
+    </ScrollView>
+</FrameLayout>

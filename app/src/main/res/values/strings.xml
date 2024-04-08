@@ -1,0 +1,38 @@
+<resources>
+    <string name="app_name">MyDesck</string>
+    <!-- Menu Draver Strings -->
+    <string name="ad_cat1">Обьявления</string>
+    <string name="ad_me_ads">Мои обьявления</string>
+    <string name="ad_car">Машины</string>
+    <string name="ad_pc">Компьютеры</string>
+    <string name="ad_smartphones">Смартфоны</string>
+    <string name="ad_dm">Бытовая техника</string>
+    <string name="ad_cat2">Аккаунт</string>
+    <string name="ad_sing_up">Регистрация</string>
+    <string name="ad_sing_in">Вход</string>
+    <string name="ad_sing_out">Выход</string>
+    <string name="open">Open</string>
+    <string name="not_reg">Войдите или зарегестрируйтесь!</string>
+    <string name="close">Close</string>
+    <!-- Sing Dialog -->
+    <string name="email_hint">Email</string>
+    <string name="forget_password">Забыли пароль?</string>
+    <string name="password_hint">Password</string>
+    <string name="ad_sing_up_action">Войти</string>
+    <string name="ad_sing_in_action">Зарестрироваться</string>
+    <string name="sing_up_error">Неудалось зарегестрироваться!</string>
+    <string name="send_verification_email_error">Неудалось отправить email для потверждения! </string>
+    <string name="send_verification_done">На вашу почту была отправвлена ссылка для потверждения вашего аккаунтаб пожалуйста подтвердите ваш аккаунт! </string>
+    <string name="sing_in_error">Неудалось войти!</string>
+    <string name="dialog_reset_email_message">Для востановления пароля укажите ваш Email адресс!</string>
+    <string name="email_reset_password_was_sent">Электронное письмо для сброса было отправлено!</string>
+    <string name="default_web_client_id" translatable="false">658702966140-2f9bqkhec6sif08s897t65kqu3mvs7i5.apps.googleusercontent.com</string>
+    <!-- Sing Dialog -->
+    <string name="link_done">Email успешно поключен к Google аккаунту!</string>
+    <string name="not">У вас уже есть аккаунт с этим Email адресом войдите по нему!</string>
+    <string name="noResult">No result</string>
+    <!-- Edit Activity -->
+    <string name="select_country">*Выберите страну</string>
+    <string name="select_city">*Выберите город</string>
+    <string name="noCountrySelected">No country selected</string>
+</resources>

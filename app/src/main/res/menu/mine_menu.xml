@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+<item
+    android:title="New add"
+    android:id="@+id/id_new_add"
+    android:icon="@drawable/baseline_fiber_new_24"
+    app:showAsAction="ifRoom"
+    />
+</menu>

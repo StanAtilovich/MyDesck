@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "658702966140",
+    "project_id": "mytable-3c20f",
+    "storage_bucket": "mytable-3c20f.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:658702966140:android:11d6338b4f0c576cdad8f9",
+        "android_client_info": {
+          "package_name": "ru.stan.mydesck"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "658702966140-o8mt37jlilu83tbpogkj6kphvnnp4128.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "ru.stan.mydesck",
+            "certificate_hash": "9b26dcb11b867b3a148192c0606062c6ae200281"
+          }
+        },
+        {
+          "client_id": "658702966140-2f9bqkhec6sif08s897t65kqu3mvs7i5.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCS5edJdROX_u5rdFsJiW2MzCjEgZXBnTs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "658702966140-2f9bqkhec6sif08s897t65kqu3mvs7i5.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

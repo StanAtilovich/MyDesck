@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <TextView
+        android:id="@+id/tvSingTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="@string/ad_sing_up"
+        android:textColor="@color/black"
+        android:textSize="18sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <EditText
+        android:id="@+id/edSingInEmail"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:background="@drawable/common_google_signin_btn_icon_dark_normal_background"
+        android:ems="10"
+        android:hint="@string/email_hint"
+        android:inputType="text|textEmailAddress"
+        android:padding="10dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tvDialogMessage" />
+
+    <EditText
+        android:id="@+id/edSingInPasword"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:background="@drawable/common_google_signin_btn_icon_dark_normal_background"
+        android:ems="10"
+        android:hint="@string/password_hint"
+        android:inputType="text|textPassword"
+        android:padding="10dp"
+        app:layout_constraintEnd_toEndOf="@+id/edSingInEmail"
+        app:layout_constraintStart_toStartOf="@+id/edSingInEmail"
+        app:layout_constraintTop_toBottomOf="@+id/edSingInEmail" />
+
+    <com.google.android.gms.common.SignInButton
+        android:id="@+id/btGoogleSingIn"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="Button"
+        app:layout_constraintEnd_toEndOf="@+id/btSingUpIn"
+        app:layout_constraintStart_toStartOf="@+id/btSingUpIn"
+        app:layout_constraintTop_toBottomOf="@+id/edSingInPasword" />
+
+    <Button
+        android:id="@+id/btSingUpIn"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:background="@drawable/common_google_signin_btn_icon_dark_normal_background"
+        android:text="@string/ad_sing_in_action"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="@+id/edSingInEmail"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="@+id/edSingInEmail"
+        app:layout_constraintTop_toBottomOf="@+id/btGoogleSingIn"
+        app:layout_constraintVertical_bias="0.021" />
+
+    <Button
+        android:id="@+id/btForgetPasword"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="@string/forget_password"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="@+id/edSingInEmail"
+        app:layout_constraintStart_toStartOf="@+id/edSingInEmail"
+        app:layout_constraintTop_toBottomOf="@+id/btSingUpIn" />
+
+    <TextView
+        android:id="@+id/tvDialogMessage"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:gravity="center_horizontal"
+        android:text="@string/dialog_reset_email_message"
+        android:textColor="@color/design_default_color_error"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="@+id/edSingInEmail"
+        app:layout_constraintStart_toStartOf="@+id/edSingInEmail"
+        app:layout_constraintTop_toBottomOf="@+id/tvSingTitle" />
+</androidx.constraintlayout.widget.ConstraintLayout>
