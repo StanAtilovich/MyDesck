@@ -7,4 +7,7 @@
     </style>
 
     <style name="Theme.MyDesck" parent="Base.Theme.MyDesck" />
+    <style name="ActionBarCustom" >
+        <item name="android:textColorSecondary">@color/green</item>
+    </style>
 </resources>

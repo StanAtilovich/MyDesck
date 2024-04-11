@@ -58,4 +58,9 @@ dependencies {
     implementation  ("io.ak1.pix:piximagepicker:1.6.3")
     implementation  ("com.fxn769:pix:1.5.6")
 
+    implementation ("com.squareup.picasso:picasso:2.8")
+    implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
+
+    implementation ("com.google.android.gms:play-services-ads:23.0.0")
 }
+

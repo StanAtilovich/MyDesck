@@ -11,9 +11,8 @@
         />
 
     <item
-    android:title="Add"
-    android:id="@+id/id_add_image"
-    android:icon="@drawable/add_image"
-    app:showAsAction="ifRoom"
-    />
+        android:id="@+id/id_add_image"
+        android:icon="@drawable/add_image"
+        android:title="Add"
+        app:showAsAction="ifRoom" />
 </menu>
