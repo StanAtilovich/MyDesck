@@ -9,8 +9,7 @@ import ru.stan.mydesck.accountHelper.AccountHelper
 import ru.stan.mydesck.databinding.SingDialogBinding
 
 
-class DialogHelper(act: MainActivity) {
-    private val act = act
+class DialogHelper(val act: MainActivity) {
     val accHelper = AccountHelper(act)
 
     fun createSingDialog(index: Int) {

@@ -4,9 +4,6 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import android.widget.ImageButton
-import android.widget.ImageView
-import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import ru.stan.mydesck.R
 import ru.stan.mydesck.act.EditAdsActivity
@@ -22,7 +19,8 @@ class SelectImageAvAdapter(val adapterCallBack: AdapterCallBack) :
     val mainArray = ArrayList<Bitmap>()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ImageHolder {
-        val viewBinding = SelectImageItemBinding.inflate(LayoutInflater.from(parent.context), parent,false)
+        val viewBinding =
+            SelectImageItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
 
         return ImageHolder(viewBinding, parent.context, this)
     }
@@ -54,11 +52,9 @@ class SelectImageAvAdapter(val adapterCallBack: AdapterCallBack) :
     ) :
         RecyclerView.ViewHolder(viewBinding.root) {
         fun setData(bitmap: Bitmap) {
-           viewBinding.imEditImage.setOnClickListener {
-                ImagePicker.getImages(
-                    context as EditAdsActivity,
-                    1,
-                    ImagePicker.REQUEST_CODE_GET_STRING_IMAGE
+            viewBinding.imEditImage.setOnClickListener {
+                ImagePicker.getSingleImage(
+                    context as EditAdsActivity
                 )
                 context.editImagePos = bindingAdapterPosition
             }
@@ -70,7 +66,7 @@ class SelectImageAvAdapter(val adapterCallBack: AdapterCallBack) :
             }
             viewBinding.tvTitle.text =
                 context.resources.getStringArray(R.array.title_array)[bindingAdapterPosition]
-            ImageManager.chooseScaleTape(viewBinding.imageContent,bitmap)
+            ImageManager.chooseScaleTape(viewBinding.imageContent, bitmap)
             viewBinding.imageContent.setImageBitmap(bitmap)
         }
     }

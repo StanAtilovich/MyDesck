@@ -38,11 +38,26 @@
     <string name="loading">Loading</string>
     <string name="city">Город</string>
     <string name="country">Страна</string>
-    <string name="index">Индекс</string>
+    <string name="index">*Индекс</string>
     <string name="tel">Телефон</string>
-    <string name="tel_number">Номер телефона</string>
+    <string name="tel_number">*Номер телефона</string>
 
     <string name="adId">ca-app-pub-3940256099942544/9214589741</string>
     <string name="ad_iner_id">ca-app-pub-3940256099942544/1033173712</string>
 
+    <string name="category">Категория</string>
+    <string name="select_category">*Выберите категорию</string>
+    <string name="price">Цена</string>
+    <string name="price_hint">*Цена</string>
+    <string name="discription">Описание</string>
+    <string name="discription_hint">*Описание</string>
+    <string name="with_send">С отправкой</string>
+    <string name="publish">Опубликовать</string>
+    <string name="title">Заголовок</string>
+    <string name="title_hint">*Название обьявления</string>
+
+    <!-- Add list item -->
+    <string name="price_desc">Цена:</string>
+    <string name="fev">Разное</string>
+    <string name="guest">Гость</string>
 </resources>

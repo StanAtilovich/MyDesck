@@ -10,4 +10,9 @@
     <style name="ActionBarCustom" >
         <item name="android:textColorSecondary">@color/green</item>
     </style>
+
+    <style name="ToolbarMainStyle" parent="Theme.AppCompat.Light.DarkActionBar">
+        <item name="colorControlNormal">@color/green</item>
+        <item name="fontFamily">sans-serif-condensed</item>
+    </style>
 </resources>

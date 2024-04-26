@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+<item
+    android:title="New_add"
+    android:id="@+id/id_new_ad"
+    android:icon="@drawable/baseline_fiber_new_24"
+    android:orderInCategory="400"/>
+
+    <item
+        android:title="My_add"
+        android:id="@+id/id_my_ads"
+        android:icon="@drawable/my_ads"
+        android:orderInCategory="300"/>
+    <item
+        android:title="Fav"
+        android:id="@+id/id_fav"
+        android:icon="@drawable/fav_bormal"
+        android:orderInCategory="200"/>
+    <item
+        android:title="Home"
+        android:id="@+id/id_home"
+        android:icon="@drawable/home"
+        android:orderInCategory="100"/>
+</menu>

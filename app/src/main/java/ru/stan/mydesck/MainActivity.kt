@@ -3,41 +3,51 @@ package ru.stan.mydesck
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
-import android.view.Menu
 import android.view.MenuItem
+import android.view.View
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.GravityCompat
+import androidx.activity.viewModels
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.common.api.ApiException
 import com.google.android.material.navigation.NavigationView
-import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
+import ru.stan.mydesck.accountHelper.AccountHelper
 import ru.stan.mydesck.act.EditAdsActivity
+import ru.stan.mydesck.adapters.AdsRcAdapter
 import ru.stan.mydesck.databinding.ActivityMainBinding
 import ru.stan.mydesck.dialogHelper.DialogConst
 import ru.stan.mydesck.dialogHelper.DialogHelper
 import ru.stan.mydesck.dialogHelper.GoogleAcCounst
+import ru.stan.mydesck.model.Ad
+import ru.stan.mydesck.viewModel.FirebaseViewModel
 
 
-class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
+class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener,
+    AdsRcAdapter.Listener {
     private lateinit var tvAccount: TextView
     private lateinit var binding: ActivityMainBinding
     private val dialogHelper = DialogHelper(this)
-    val mAuth = FirebaseAuth.getInstance()
+    val mAuth = Firebase.auth
+    private val firebaseViewModel: FirebaseViewModel by viewModels()
+    val adapter = AdsRcAdapter(this)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
         init()
+        initRecyclerView()
+        initViewModel()
+        firebaseViewModel.loadAllAds()
+        bottomMenuClick()
     }
 
-    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        menuInflater.inflate(R.menu.mine_menu, menu)
-        return super.onCreateOptionsMenu(menu)
-    }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (requestCode == GoogleAcCounst.GOOGLE_SING_IN_REQUEST_CODE) {
@@ -60,12 +70,44 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         uiUpdate(mAuth.currentUser)
     }
 
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        if (item.itemId == R.id.id_new_add) {
-            val i = Intent(this, EditAdsActivity::class.java)
-            startActivity(i)
+    override fun onResume() {
+        super.onResume()
+        binding.mainContent.bNavView.selectedItemId = R.id.id_home
+    }
+
+
+    private fun bottomMenuClick() = with(binding) {
+        mainContent.bNavView.setOnNavigationItemSelectedListener { item ->
+            when (item.itemId) {
+                R.id.id_new_ad -> {
+                    val i = Intent(this@MainActivity, EditAdsActivity::class.java)
+                    startActivity(i)
+                }
+
+                R.id.id_my_ads -> {
+                    firebaseViewModel.loadMyAds()
+                    mainContent.toolbar.title = getString(R.string.ad_me_ads)
+                }
+
+                R.id.id_fav -> {
+                    firebaseViewModel.loadMyFavs()
+                }
+
+                R.id.id_home -> {
+                    firebaseViewModel.loadAllAds()
+                    mainContent.toolbar.title = getString(R.string.fev)
+                }
+            }
+            true
         }
-        return super.onOptionsItemSelected(item)
+
+    }
+
+    private fun initViewModel() {
+        firebaseViewModel.liveAdsData.observe(this) {
+            adapter.updateAdapter(it)
+            binding.mainContent.tvEmpty.visibility = if (it.isEmpty()) View.VISIBLE else View.GONE
+        }
     }
 
     private fun init() {
@@ -79,6 +121,13 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         binding.navView.setNavigationItemSelectedListener(this)
 
         tvAccount = binding.navView.getHeaderView(0).findViewById(R.id.tvAccountEmail)
+    }
+
+    private fun initRecyclerView() {
+        binding.apply {
+            mainContent.rcView.layoutManager = LinearLayoutManager(this@MainActivity)
+            mainContent.rcView.adapter = adapter
+        }
     }
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
@@ -112,6 +161,10 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             }
 
             R.id.is_sing_out -> {
+                if (mAuth.currentUser?.isAnonymous == true) {
+                    binding.drawerLayout.closeDrawer(GravityCompat.START)
+                    return true
+                }
                 uiUpdate(null)
                 mAuth.signOut()
                 dialogHelper.accHelper.singOutG()
@@ -122,11 +175,35 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     }
 
     fun uiUpdate(user: FirebaseUser?) {
-        tvAccount.text = if (user == null) {
-            resources.getString(R.string.not_reg)
-        } else {
-            user.email
+
+        if (user == null) {
+            dialogHelper.accHelper.singInAnonymysle(object : AccountHelper.Listener {
+                override fun onComplete() {
+                    tvAccount.setText(R.string.guest)
+                }
+            })
+        } else if (user.isAnonymous) {
+            tvAccount.setText(R.string.guest)
+        } else if (!user.isAnonymous) {
+            tvAccount.text = user.email
         }
+    }
+
+    companion object {
+        const val EDIT_STATE = "EDIT_STATE"
+        const val ADS_DATA = "ADS_DATA"
+    }
+
+    override fun onDeleteItem(ad: Ad) {
+        firebaseViewModel.deleteItem(ad)
+    }
+
+    override fun onAdView(ad: Ad) {
+        firebaseViewModel.adViewed(ad)
+    }
+
+    override fun onFavClicked(ad: Ad) {
+        firebaseViewModel.onFavClick(ad)
     }
 
 }

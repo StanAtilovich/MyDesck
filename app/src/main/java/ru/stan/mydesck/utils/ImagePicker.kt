@@ -1,14 +1,17 @@
 package ru.stan.mydesck.utils
 
-import android.content.Intent
 import android.graphics.Bitmap
+import android.net.Uri
 import android.view.View
-import androidx.appcompat.app.AppCompatActivity
-import com.fxn.pix.Options
-import com.fxn.pix.Pix
+import androidx.fragment.app.Fragment
+import io.ak1.pix.helpers.PixEventCallback
+import io.ak1.pix.helpers.addPixToActivity
+import io.ak1.pix.models.Mode
+import io.ak1.pix.models.Options
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import ru.stan.mydesck.R
 import ru.stan.mydesck.act.EditAdsActivity
 
 
@@ -16,51 +19,82 @@ object ImagePicker {
     const val MAX_IMAGE_COUNT = 3
     const val REQUEST_CODE_GET_IMAGES = 999
     const val REQUEST_CODE_GET_STRING_IMAGE = 998
-    fun getImages(context: AppCompatActivity, imageCounter: Int, rCode: Int) {
-        val options = Options.init()
-            .setRequestCode(rCode)
-            .setCount(imageCounter)
-            .setFrontfacing(false)
-            .setSpanCount(4)
-            .setMode(Options.Mode.All)
-            .setVideoDurationLimitinSeconds(30)
-            .setScreenOrientation(Options.SCREEN_ORIENTATION_PORTRAIT)
-            .setPath("/pix/images");
-
-
-        Pix.start(context, options)
+    private fun getOptions(imageCounter: Int): Options {
+        val options = Options().apply {
+            count = imageCounter
+            isFrontFacing = false
+            mode = Mode.Picture
+            path = "/pix/images"
+        }
+        return options
     }
 
-    fun showSelectedImages(
-        resultCode: Int,
-        requestCode: Int,
-        data: Intent,
-        ediAct: EditAdsActivity
+    fun getMultiImages(
+        ediAct: EditAdsActivity,
+        imageCounter: Int
     ) {
-        if (resultCode == AppCompatActivity.RESULT_OK && requestCode == REQUEST_CODE_GET_IMAGES) {
-
-            if (data != null) {
-                val returnValues: ArrayList<String> =
-                    data.getStringArrayListExtra(Pix.IMAGE_RESULTS) as ArrayList<String>
-                if (returnValues.size > 1 && ediAct.chooseImageFrag == null) {
-                    ediAct.openChooseImageFragment(returnValues)
-                } else if (ediAct.chooseImageFrag != null) {
-                    ediAct.chooseImageFrag?.updateAdapter(returnValues)
-                } else if (returnValues.size == 1 && ediAct.chooseImageFrag == null) {
-                    CoroutineScope(Dispatchers.Main).launch {
-                        ediAct.binding.pBoadLoad.visibility = View.GONE
-                        val tempList = ImageManager.imageResize(returnValues) as ArrayList<Bitmap>
-                        ediAct.binding.pBoadLoad.visibility = View.GONE
-                        ediAct.imageAdapter.update(tempList)
-                    }
+        ediAct.addPixToActivity(R.id.placeHolder, getOptions(imageCounter)) { result ->
+            when (result.status) {
+                PixEventCallback.Status.SUCCESS -> {
+                    getMultiSelectImages(ediAct, result.data)
+                    closePixFrag(ediAct)
                 }
+
+                else -> {}
             }
-        } else if (resultCode == AppCompatActivity.RESULT_OK && requestCode == REQUEST_CODE_GET_STRING_IMAGE) {
-            if (data != null) {
-                val urls = data.getStringArrayListExtra(Pix.IMAGE_RESULTS)
-                ediAct.chooseImageFrag?.setSingleImage(urls?.get(0)!!, ediAct.editImagePos)
+        }
+    }
+
+    fun getSingleImage(ediAct: EditAdsActivity) {
+        val f = ediAct.chooseImageFrag
+        ediAct.addPixToActivity(R.id.placeHolder, getOptions(1)) { result ->
+            when (result.status) {
+                PixEventCallback.Status.SUCCESS -> {
+                    ediAct.chooseImageFrag = f
+                    openChooseImageFrag(ediAct, f!!)
+                    singleImage(ediAct, result.data[0])
+                }
+
+                else -> {}
+            }
+        }
+    }
+    private fun openChooseImageFrag(ediAct: EditAdsActivity, f: Fragment){
+        ediAct.supportFragmentManager.beginTransaction().replace(R.id.placeHolder, f).commit()
+    }
+
+    private fun closePixFrag(ediAct: EditAdsActivity) {
+        val fList = ediAct.supportFragmentManager.fragments
+        fList.forEach {
+            if (it.isVisible) ediAct.supportFragmentManager.beginTransaction().remove(it).commit()
+        }
+    }
+
+    fun getMultiSelectImages(ediAct: EditAdsActivity, urls: List<Uri>) {
+
+        if (urls.size > 1 && ediAct.chooseImageFrag == null) {
+            ediAct.openChooseImageFragment(urls as ArrayList<Uri>)
+        } else if (ediAct.chooseImageFrag != null) {
+            ediAct.chooseImageFrag?.updateAdapter(urls as ArrayList<Uri>)
+        } else if (urls.size == 1 && ediAct.chooseImageFrag == null) {
+            CoroutineScope(Dispatchers.Main).launch {
+                ediAct.binding.pBoadLoad.visibility = View.GONE
+                val tempList =
+                    ImageManager.imageResize(urls as ArrayList<Uri>, ediAct) as ArrayList<Bitmap>
+                ediAct.binding.pBoadLoad.visibility = View.GONE
+                ediAct.imageAdapter.update(tempList)
             }
 
         }
+
     }
+
+    private fun singleImage(ediAct: EditAdsActivity, uri: Uri) {
+        ediAct.chooseImageFrag?.setSingleImage(uri, ediAct.editImagePos)
+
+
+    }
+
 }
+
+
