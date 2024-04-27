@@ -15,4 +15,5 @@
         <item name="colorControlNormal">@color/green</item>
         <item name="fontFamily">sans-serif-condensed</item>
     </style>
+
 </resources>

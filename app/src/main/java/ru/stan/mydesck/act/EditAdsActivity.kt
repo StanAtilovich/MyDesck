@@ -28,6 +28,7 @@ class EditAdsActivity : AppCompatActivity(), FragmentCloseInterface {
     private val dialog = DialogSpinnerHelper()
     lateinit var imageAdapter: ImageAdapter
     private val dbManager = DbManager()
+    private var imageIndex = 0
 
 
     var editImagePos = 0
@@ -93,12 +94,12 @@ class EditAdsActivity : AppCompatActivity(), FragmentCloseInterface {
     }
 
     fun onClickPublish(view: View) {
-        val adTemp = fillAd()
+        ad = fillAd()
         if (isEditState) {
-            dbManager.publishAdd(adTemp.copy(key = ad?.key), onPublishFinish())
+            ad?.copy(key = ad?.key)?.let { dbManager.publishAdd(it, onPublishFinish()) }
         } else {
             if (imageAdapter.mainArray.isNotEmpty()) {
-                uploadAllImages(adTemp)
+                uploadAllImages()
             } else {
                 Toast.makeText(this, "Выберите изображения для загрузки", Toast.LENGTH_SHORT).show()
             }
@@ -128,6 +129,8 @@ class EditAdsActivity : AppCompatActivity(), FragmentCloseInterface {
                 edTitle.text.toString(),
                 editPrice.text.toString(),
                 editDiscription.text.toString(),
+                "empty",
+                "empty",
                 "empty",
                 dbManager.db.push().key,
                 dbManager.auth.uid, "0",
@@ -168,12 +171,32 @@ class EditAdsActivity : AppCompatActivity(), FragmentCloseInterface {
         fm.commit()
     }
 
-    private fun uploadAllImages(adTemp: Ad) {
-        val byteArray = prepareImageByArray(imageAdapter.mainArray[0])
+    private fun uploadAllImages() {
+        if (imageAdapter.mainArray.size == imageIndex){
+            dbManager.publishAdd(ad!!, onPublishFinish())
+            return
+        }
+        val byteArray = prepareImageByArray(imageAdapter.mainArray[imageIndex])
         uploadImage(byteArray) {
-            dbManager.publishAdd(adTemp.copy(mainImage = it.result.toString()), onPublishFinish())
+           // dbManager.publishAdd(ad!!, onPublishFinish())
+            nextImage(it.result.toString())
         }
     }
+
+    private fun setImageUriToAd(uri: String) {
+        when (imageIndex) {
+            0 -> ad = ad?.copy(mainImage = uri)
+            1 -> ad = ad?.copy(image2 = uri)
+            2 -> ad = ad?.copy(image3 = uri)
+        }
+    }
+
+    private fun nextImage(uri: String) {
+        setImageUriToAd(uri)
+        imageIndex++
+        uploadAllImages()
+    }
+
     private fun prepareImageByArray(bitmap: Bitmap): ByteArray {
         val outStream = ByteArrayOutputStream()
         bitmap.compress(Bitmap.CompressFormat.JPEG, 20, outStream)

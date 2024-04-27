@@ -8,6 +8,7 @@ import android.view.View.OnClickListener
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
+import com.squareup.picasso.Picasso
 import ru.stan.mydesck.MainActivity
 import ru.stan.mydesck.R
 import ru.stan.mydesck.act.EditAdsActivity
@@ -47,13 +48,23 @@ class AdsRcAdapter(val act: MainActivity) : RecyclerView.Adapter<AdsRcAdapter.Ad
             tvTitle.text = ad.title
             tvViewCounter.text = ad.viewCounter
             tvFavCounter.text = ad.favCounter
-            if (ad.isFav){
+Picasso.get().load(ad.mainImage).into(myImageeView)
+
+            isFav(ad)
+            showEditPanel(isOwner(ad))
+            mainOnClick(ad)
+
+        }
+
+        private fun isFav(ad: Ad) = with(binding) {
+            if (ad.isFav) {
                 ibFav.setImageResource(R.drawable.fav_presed)
             } else {
                 ibFav.setImageResource(R.drawable.fav_bormal)
             }
-            showEditPanel(isOwner(ad))
-            ibEditAd.setOnClickListener(onClickEdit(ad))
+        }
+
+        private fun mainOnClick(ad: Ad) = with(binding) {
             imDeleteAd.setOnClickListener {
                 act.onDeleteItem(ad)
             }
@@ -61,8 +72,9 @@ class AdsRcAdapter(val act: MainActivity) : RecyclerView.Adapter<AdsRcAdapter.Ad
                 act.onAdView(ad)
             }
             ibFav.setOnClickListener {
-                if (act.mAuth.currentUser?.isAnonymous == false)act.onFavClicked(ad)
+                if (act.mAuth.currentUser?.isAnonymous == false) act.onFavClicked(ad)
             }
+            ibEditAd.setOnClickListener(onClickEdit(ad))
         }
 
         private fun onClickEdit(ad: Ad): OnClickListener {
