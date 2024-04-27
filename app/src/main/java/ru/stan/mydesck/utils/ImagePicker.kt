@@ -45,13 +45,27 @@ object ImagePicker {
         }
     }
 
+    fun addImages(
+        ediAct: EditAdsActivity,
+        imageCounter: Int
+    ) {
+        ediAct.addPixToActivity(R.id.placeHolder, getOptions(imageCounter)) { result ->
+            when (result.status) {
+                PixEventCallback.Status.SUCCESS -> {
+                    openChooseImageFrag(ediAct)
+                    ediAct.chooseImageFrag?.updateAdapter(result.data as ArrayList<Uri>, ediAct)
+                }
+
+                else -> {}
+            }
+        }
+    }
+
     fun getSingleImage(ediAct: EditAdsActivity) {
-        val f = ediAct.chooseImageFrag
         ediAct.addPixToActivity(R.id.placeHolder, getOptions(1)) { result ->
             when (result.status) {
                 PixEventCallback.Status.SUCCESS -> {
-                    ediAct.chooseImageFrag = f
-                    openChooseImageFrag(ediAct, f!!)
+                    openChooseImageFrag(ediAct)
                     singleImage(ediAct, result.data[0])
                 }
 
@@ -59,8 +73,9 @@ object ImagePicker {
             }
         }
     }
-    private fun openChooseImageFrag(ediAct: EditAdsActivity, f: Fragment){
-        ediAct.supportFragmentManager.beginTransaction().replace(R.id.placeHolder, f).commit()
+
+    private fun openChooseImageFrag(ediAct: EditAdsActivity) {
+        ediAct.supportFragmentManager.beginTransaction().replace(R.id.placeHolder, ediAct.chooseImageFrag!!).commit()
     }
 
     private fun closePixFrag(ediAct: EditAdsActivity) {
@@ -74,8 +89,6 @@ object ImagePicker {
 
         if (urls.size > 1 && ediAct.chooseImageFrag == null) {
             ediAct.openChooseImageFragment(urls as ArrayList<Uri>)
-        } else if (ediAct.chooseImageFrag != null) {
-            ediAct.chooseImageFrag?.updateAdapter(urls as ArrayList<Uri>)
         } else if (urls.size == 1 && ediAct.chooseImageFrag == null) {
             CoroutineScope(Dispatchers.Main).launch {
                 ediAct.binding.pBoadLoad.visibility = View.GONE
@@ -83,6 +96,7 @@ object ImagePicker {
                     ImageManager.imageResize(urls as ArrayList<Uri>, ediAct) as ArrayList<Bitmap>
                 ediAct.binding.pBoadLoad.visibility = View.GONE
                 ediAct.imageAdapter.update(tempList)
+                closePixFrag(ediAct)
             }
 
         }

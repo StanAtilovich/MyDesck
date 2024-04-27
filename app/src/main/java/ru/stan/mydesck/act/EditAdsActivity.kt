@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import com.google.android.gms.tasks.OnCompleteListener
 import ru.stan.mydesck.MainActivity
 import ru.stan.mydesck.R
 import ru.stan.mydesck.adapters.ImageAdapter
@@ -18,6 +19,7 @@ import ru.stan.mydesck.fragment.ImageListFragment
 import ru.stan.mydesck.model.DbManager
 import ru.stan.mydesck.utils.CountryHelper
 import ru.stan.mydesck.utils.ImagePicker
+import java.io.ByteArrayOutputStream
 
 
 class EditAdsActivity : AppCompatActivity(), FragmentCloseInterface {
@@ -26,7 +28,6 @@ class EditAdsActivity : AppCompatActivity(), FragmentCloseInterface {
     private val dialog = DialogSpinnerHelper()
     lateinit var imageAdapter: ImageAdapter
     private val dbManager = DbManager()
-
 
 
     var editImagePos = 0
@@ -96,10 +97,14 @@ class EditAdsActivity : AppCompatActivity(), FragmentCloseInterface {
         if (isEditState) {
             dbManager.publishAdd(adTemp.copy(key = ad?.key), onPublishFinish())
         } else {
-            dbManager.publishAdd(adTemp, onPublishFinish())
+            if (imageAdapter.mainArray.isNotEmpty()) {
+                uploadAllImages(adTemp)
+            } else {
+                Toast.makeText(this, "Выберите изображения для загрузки", Toast.LENGTH_SHORT).show()
+            }
         }
-
     }
+
 
     private fun onPublishFinish(): DbManager.FinishWorkListener {
         return object : DbManager.FinishWorkListener {
@@ -123,9 +128,11 @@ class EditAdsActivity : AppCompatActivity(), FragmentCloseInterface {
                 edTitle.text.toString(),
                 editPrice.text.toString(),
                 editDiscription.text.toString(),
+                "empty",
                 dbManager.db.push().key,
-                dbManager.auth.uid,"0",
-            )
+                dbManager.auth.uid, "0",
+
+                )
         }
         return ad
     }
@@ -139,7 +146,7 @@ class EditAdsActivity : AppCompatActivity(), FragmentCloseInterface {
 
     fun onClickGetImages(view: View) {
         if (imageAdapter.mainArray.size == 0) {
-            ImagePicker.getMultiImages(this,  3)
+            ImagePicker.getMultiImages(this, 3)
         } else {
             openChooseImageFragment(null)
             chooseImageFrag?.updateAdapterFromEdit(imageAdapter.mainArray)
@@ -159,6 +166,28 @@ class EditAdsActivity : AppCompatActivity(), FragmentCloseInterface {
         val fm = supportFragmentManager.beginTransaction()
         fm.replace(R.id.placeHolder, chooseImageFrag!!)
         fm.commit()
+    }
+
+    private fun uploadAllImages(adTemp: Ad) {
+        val byteArray = prepareImageByArray(imageAdapter.mainArray[0])
+        uploadImage(byteArray) {
+            dbManager.publishAdd(adTemp.copy(mainImage = it.result.toString()), onPublishFinish())
+        }
+    }
+    private fun prepareImageByArray(bitmap: Bitmap): ByteArray {
+        val outStream = ByteArrayOutputStream()
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 20, outStream)
+        return outStream.toByteArray()
+
+    }
+
+    private fun uploadImage(byteArray: ByteArray, listener: OnCompleteListener<Uri>) {
+        val imStorageReferance = dbManager.dbStorage.child(dbManager.auth.uid!!)
+            .child("image_${System.currentTimeMillis()}")
+        val upTask = imStorageReferance.putBytes(byteArray)
+        upTask.continueWithTask { task ->
+            imStorageReferance.downloadUrl
+        }.addOnCompleteListener(listener)
     }
 
 }

@@ -73,20 +73,21 @@ class ImageListFragment(
 
     override fun onDetach() {
         super.onDetach()
-        fragCloseInterface.onFragClose(adapter.mainArray)
-        job?.cancel()
     }
 
     override fun unClose() {
         super.unClose()
         activity?.supportFragmentManager?.beginTransaction()?.remove(this@ImageListFragment)
             ?.commit()
+        fragCloseInterface.onFragClose(adapter.mainArray)
+        job?.cancel()
     }
 
     private fun setUpToolBar() = with(binding) {
         tb.inflateMenu(R.menu.menu_choose_image)
         val deleteItem = tb.menu.findItem(R.id.id_delete_image)
         addImageItem = tb.menu.findItem(R.id.id_add_image)
+        if (adapter.mainArray.size > 2) addImageItem?.isVisible = false
         tb.setNavigationOnClickListener {
             showInterAd()
         }
@@ -97,13 +98,13 @@ class ImageListFragment(
         }
         addImageItem?.setOnMenuItemClickListener {
             val imageCount = ImagePicker.MAX_IMAGE_COUNT - adapter.mainArray.size
-            ImagePicker.getMultiImages(activity as EditAdsActivity,imageCount)
+            ImagePicker.addImages(activity as EditAdsActivity,imageCount)
             true
         }
     }
 
-    fun updateAdapter(newList: ArrayList<Uri>) {
-        resizeSelectedImages(newList, false, activity as Activity)
+    fun updateAdapter(newList: ArrayList<Uri>, activity: Activity) {
+        resizeSelectedImages(newList, false, activity)
     }
 
     @SuppressLint("NotifyDataSetChanged")
