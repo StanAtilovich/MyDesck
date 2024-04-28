@@ -2,9 +2,12 @@ package ru.stan.mydesck
 
 import android.content.Intent
 import android.os.Bundle
+import android.text.SpannableString
+import android.text.style.ForegroundColorSpan
 import android.util.Log
 import android.view.MenuItem
 import android.view.View
+import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
@@ -13,13 +16,16 @@ import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.GravityCompat
 import androidx.activity.viewModels
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.common.api.ApiException
 import com.google.android.material.navigation.NavigationView
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
+import com.squareup.picasso.Picasso
 import ru.stan.mydesck.accountHelper.AccountHelper
 import ru.stan.mydesck.act.DescriptionActivity
 import ru.stan.mydesck.act.EditAdsActivity
@@ -35,6 +41,7 @@ import ru.stan.mydesck.viewModel.FirebaseViewModel
 class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener,
     AdsRcAdapter.Listener {
     private lateinit var tvAccount: TextView
+    private lateinit var imAccount: ImageView
     private lateinit var binding: ActivityMainBinding
     private val dialogHelper = DialogHelper(this)
     val mAuth = Firebase.auth
@@ -50,6 +57,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         initViewModel()
         firebaseViewModel.loadAllAds()
         bottomMenuClick()
+        scrollListener()
     }
 
 
@@ -117,6 +125,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     private fun init() {
         setSupportActionBar(binding.mainContent.toolbar)
         onActivityResult()
+        navViewSettings()
         val toggle = ActionBarDrawerToggle(
             this, binding.drawerLayout, binding.mainContent.toolbar, R.string.open, R.string.close
         )
@@ -126,6 +135,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         binding.navView.setNavigationItemSelectedListener(this)
 
         tvAccount = binding.navView.getHeaderView(0).findViewById(R.id.tvAccountEmail)
+        imAccount = binding.navView.getHeaderView(0).findViewById(R.id.ivAccount)
     }
 
     private fun initRecyclerView() {
@@ -185,19 +195,19 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             dialogHelper.accHelper.singInAnonymysle(object : AccountHelper.Listener {
                 override fun onComplete() {
                     tvAccount.setText(R.string.guest)
+                    imAccount.setImageResource(R.drawable.ic_account)
                 }
             })
         } else if (user.isAnonymous) {
             tvAccount.setText(R.string.guest)
+            imAccount.setImageResource(R.drawable.ic_account)
         } else if (!user.isAnonymous) {
             tvAccount.text = user.email
+            Picasso.get().load(user.photoUrl).into(imAccount)
         }
     }
 
-    companion object {
-        const val EDIT_STATE = "EDIT_STATE"
-        const val ADS_DATA = "ADS_DATA"
-    }
+
 
     override fun onDeleteItem(ad: Ad) {
         firebaseViewModel.deleteItem(ad)
@@ -214,4 +224,48 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         firebaseViewModel.onFavClick(ad)
     }
 
+    private fun navViewSettings() = with(binding) {
+        val menu = navView.menu
+        val adsCat = menu.findItem(R.id.adsCat)
+        val spanAdsCat = SpannableString(adsCat.title)
+        spanAdsCat.setSpan(
+                ForegroundColorSpan(
+                    ContextCompat.getColor(
+                        this@MainActivity,
+                        R.color.red
+                    )
+                ), 0, adsCat.title!!.length, 0
+            )
+        adsCat.title = spanAdsCat
+
+        val acCat = menu.findItem(R.id.acCat)
+        val spanAcCat = SpannableString(acCat.title)
+        spanAcCat.setSpan(
+                ForegroundColorSpan(
+                    ContextCompat.getColor(
+                        this@MainActivity,
+                        R.color.red
+                    )
+                ), 0, acCat.title!!.length, 0
+            )
+        acCat.title = spanAcCat
+    }
+
+    private fun scrollListener() = with(binding.mainContent){
+        rcView.addOnScrollListener(object : RecyclerView.OnScrollListener(){
+            override fun onScrollStateChanged(rcView: RecyclerView, newState: Int) {
+                super.onScrollStateChanged(rcView, newState)
+                if (!rcView.canScrollVertically(SCROOL_DONE)
+                    && newState == RecyclerView.SCROLL_STATE_IDLE){
+                    Log.d("MyLog", "неможет скролировать вниз")
+                }
+            }
+        })
+    }
+
+    companion object {
+        const val EDIT_STATE = "EDIT_STATE"
+        const val ADS_DATA = "ADS_DATA"
+        const val SCROOL_DONE = 1
+    }
 }

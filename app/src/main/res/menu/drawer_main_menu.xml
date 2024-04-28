@@ -2,7 +2,7 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     tools:showIn = "navigation_view">
-    <item android:title="@string/ad_cat1">
+    <item android:title="@string/ad_cat1" android:id="@+id/adsCat">
     <menu>
         <item
             android:title="@string/ad_me_ads"
@@ -23,7 +23,7 @@
     </item>
 
     <item
-        android:title="@string/ad_cat2">
+        android:title="@string/ad_cat2" android:id="@+id/acCat">
 <menu>
     <item
         android:title="@string/ad_sing_up"
