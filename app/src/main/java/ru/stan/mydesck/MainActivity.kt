@@ -267,5 +267,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         const val EDIT_STATE = "EDIT_STATE"
         const val ADS_DATA = "ADS_DATA"
         const val SCROOL_DONE = 1
+
     }
 }
