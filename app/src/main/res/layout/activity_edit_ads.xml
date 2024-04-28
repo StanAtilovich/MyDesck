@@ -49,6 +49,17 @@
 
                     </androidx.viewpager2.widget.ViewPager2>
 
+                    <TextView
+                        android:id="@+id/tvImageCounter"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@color/black"
+                        android:padding="5dp"
+                        android:text="1/3"
+                        android:textColor="@color/grey"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="@+id/vpImages" />
+
                     <ImageButton
                         android:id="@+id/imageButton2"
                         android:layout_width="0dp"
@@ -140,13 +151,13 @@
                         android:orientation="horizontal"></LinearLayout>
 
                     <TextView
-                        android:id="@+id/tvTell"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_margin="5dp"
-                        android:padding="5dp"
-                        android:text="@string/tel"
-                        android:textColor="@color/green" />
+                    android:id="@+id/tvTell"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="5dp"
+                    android:padding="5dp"
+                    android:text="@string/tel"
+                    android:textColor="@color/green" />
 
                     <EditText
                         android:id="@+id/editTell"
@@ -157,6 +168,27 @@
                         android:ems="10"
                         android:hint="@string/tel_number"
                         android:inputType="number"
+                        android:padding="10dp"
+                        android:textColorHint="@color/grey" />
+
+                    <TextView
+                        android:id="@+id/tvTitleEmail"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="5dp"
+                        android:padding="5dp"
+                        android:text="@string/email_hint"
+                        android:textColor="@color/green" />
+
+                    <EditText
+                        android:id="@+id/editEmail"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="10dp"
+                        android:background="@null"
+                        android:ems="10"
+                        android:hint="@string/email_hint"
+                        android:inputType="textEmailAddress"
                         android:padding="10dp"
                         android:textColorHint="@color/grey" />
 

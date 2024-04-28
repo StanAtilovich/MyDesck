@@ -60,4 +60,6 @@
     <string name="price_desc">Цена:</string>
     <string name="fev">Разное</string>
     <string name="guest">Гость</string>
+    <string name="yes">Да</string>
+    <string name="no">Нет</string>
 </resources>

@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.squareup.picasso.Picasso
 import ru.stan.mydesck.MainActivity
 import ru.stan.mydesck.R
+import ru.stan.mydesck.act.DescriptionActivity
 import ru.stan.mydesck.act.EditAdsActivity
 import ru.stan.mydesck.databinding.AdListItemBinding
 import ru.stan.mydesck.model.Ad
@@ -48,7 +49,7 @@ class AdsRcAdapter(val act: MainActivity) : RecyclerView.Adapter<AdsRcAdapter.Ad
             tvTitle.text = ad.title
             tvViewCounter.text = ad.viewCounter
             tvFavCounter.text = ad.favCounter
-Picasso.get().load(ad.mainImage).into(myImageeView)
+            Picasso.get().load(ad.mainImage).into(myImageeView)
 
             isFav(ad)
             showEditPanel(isOwner(ad))
@@ -75,6 +76,7 @@ Picasso.get().load(ad.mainImage).into(myImageeView)
                 if (act.mAuth.currentUser?.isAnonymous == false) act.onFavClicked(ad)
             }
             ibEditAd.setOnClickListener(onClickEdit(ad))
+
         }
 
         private fun onClickEdit(ad: Ad): OnClickListener {

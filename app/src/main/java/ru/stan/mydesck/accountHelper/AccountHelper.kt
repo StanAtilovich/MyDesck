@@ -139,7 +139,7 @@ class AccountHelper(act: MainActivity) {
     fun singInWithGoogle() {
         singInClient = getSingInClient()
         val intent = singInClient.signInIntent
-        act.startActivityForResult(intent, GoogleAcCounst.GOOGLE_SING_IN_REQUEST_CODE)
+        act.googleSingInLauncher.launch(intent)
     }
 
     fun singOutG() {

@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.viewpager2.widget.ViewPager2
 import com.google.android.gms.tasks.OnCompleteListener
 import ru.stan.mydesck.MainActivity
 import ru.stan.mydesck.R
@@ -18,6 +19,7 @@ import ru.stan.mydesck.fragment.FragmentCloseInterface
 import ru.stan.mydesck.fragment.ImageListFragment
 import ru.stan.mydesck.model.DbManager
 import ru.stan.mydesck.utils.CountryHelper
+import ru.stan.mydesck.utils.ImageManager
 import ru.stan.mydesck.utils.ImagePicker
 import java.io.ByteArrayOutputStream
 
@@ -41,6 +43,7 @@ class EditAdsActivity : AppCompatActivity(), FragmentCloseInterface {
         setContentView(binding.root)
         init()
         checkEditState()
+        imageChangeCounted()
     }
 
     private fun checkEditState() {
@@ -65,6 +68,7 @@ class EditAdsActivity : AppCompatActivity(), FragmentCloseInterface {
         tvCategory.text = ad.category
         editPrice.setText(ad.price)
         editDiscription.setText(ad.description)
+        ImageManager.fillImageArray(ad, imageAdapter)
     }
 
 
@@ -129,6 +133,7 @@ class EditAdsActivity : AppCompatActivity(), FragmentCloseInterface {
                 edTitle.text.toString(),
                 editPrice.text.toString(),
                 editDiscription.text.toString(),
+                editEmail.text.toString(),
                 "empty",
                 "empty",
                 "empty",
@@ -211,6 +216,16 @@ class EditAdsActivity : AppCompatActivity(), FragmentCloseInterface {
         upTask.continueWithTask { task ->
             imStorageReferance.downloadUrl
         }.addOnCompleteListener(listener)
+    }
+
+    private fun imageChangeCounted() {
+        binding.vpImages.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
+            override fun onPageSelected(position: Int) {
+                super.onPageSelected(position)
+                val imageCounter = "${position + 1}/${binding.vpImages.adapter?.itemCount}"
+                binding.tvImageCounter.text = imageCounter
+            }
+        })
     }
 
 }

@@ -7,6 +7,8 @@ import android.view.MenuItem
 import android.view.View
 import android.widget.TextView
 import android.widget.Toast
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.GravityCompat
@@ -19,6 +21,7 @@ import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import ru.stan.mydesck.accountHelper.AccountHelper
+import ru.stan.mydesck.act.DescriptionActivity
 import ru.stan.mydesck.act.EditAdsActivity
 import ru.stan.mydesck.adapters.AdsRcAdapter
 import ru.stan.mydesck.databinding.ActivityMainBinding
@@ -35,6 +38,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     private lateinit var binding: ActivityMainBinding
     private val dialogHelper = DialogHelper(this)
     val mAuth = Firebase.auth
+    lateinit var googleSingInLauncher: ActivityResultLauncher<Intent>
     private val firebaseViewModel: FirebaseViewModel by viewModels()
     val adapter = AdsRcAdapter(this)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -49,21 +53,21 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     }
 
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        if (requestCode == GoogleAcCounst.GOOGLE_SING_IN_REQUEST_CODE) {
-
-            val task = GoogleSignIn.getSignedInAccountFromIntent(data)
-            try {
-                val account = task.getResult(ApiException::class.java)
-                if (account != null) {
-                    dialogHelper.accHelper.singInFirebaseWithGoogle(account.idToken!!)
+    private fun onActivityResult() {
+        googleSingInLauncher =
+            registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+                val task = GoogleSignIn.getSignedInAccountFromIntent(it.data)
+                try {
+                    val account = task.getResult(ApiException::class.java)
+                    if (account != null) {
+                        dialogHelper.accHelper.singInFirebaseWithGoogle(account.idToken!!)
+                    }
+                } catch (e: ApiException) {
+                    Log.d("MyLog", "Api error : ${e.message}")
                 }
-            } catch (e: ApiException) {
-                Log.d("MyLog", "Api error : ${e.message}")
             }
-        }
-        super.onActivityResult(requestCode, resultCode, data)
     }
+
 
     override fun onStart() {
         super.onStart()
@@ -112,6 +116,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
     private fun init() {
         setSupportActionBar(binding.mainContent.toolbar)
+        onActivityResult()
         val toggle = ActionBarDrawerToggle(
             this, binding.drawerLayout, binding.mainContent.toolbar, R.string.open, R.string.close
         )
@@ -200,6 +205,9 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
     override fun onAdView(ad: Ad) {
         firebaseViewModel.adViewed(ad)
+        val i = Intent(binding.root.context, DescriptionActivity::class.java)
+        i.putExtra(DescriptionActivity.AD_NODE, ad)
+        startActivity(i)
     }
 
     override fun onFavClicked(ad: Ad) {

@@ -6,8 +6,12 @@ import android.graphics.BitmapFactory
 import android.net.Uri
 import android.widget.ImageView
 import com.squareup.picasso.Picasso
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import ru.stan.mydesck.adapters.ImageAdapter
+import ru.stan.mydesck.model.Ad
 
 object ImageManager {
     private const val MAX_IMAGE_SIZE = 1000
@@ -64,6 +68,27 @@ object ImageManager {
             im.scaleType = ImageView.ScaleType.CENTER_CROP
         } else {
             im.scaleType = ImageView.ScaleType.CENTER_INSIDE
+        }
+    }
+
+    private suspend fun getBitmapFromUris(uris: List<String?>): List<Bitmap> =
+        withContext(Dispatchers.IO) {
+            val bitmapList = ArrayList<Bitmap>()
+            for (i in uris.indices) {
+                kotlin.runCatching {
+                    bitmapList.add(
+                        Picasso.get().load(uris[i]).get()
+                    )
+                }
+            }
+            return@withContext bitmapList
+        }
+
+    fun fillImageArray(ad: Ad, adapter: ImageAdapter) {
+        val listUrls = listOf(ad.mainImage, ad.image2, ad.image3)
+        CoroutineScope(Dispatchers.Main).launch {
+            val bitMapList = getBitmapFromUris(listUrls)
+            adapter.update(bitMapList as ArrayList<Bitmap>)
         }
     }
 }
