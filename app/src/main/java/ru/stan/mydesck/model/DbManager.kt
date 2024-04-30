@@ -17,12 +17,21 @@ class DbManager {
     val dbStorage = Firebase.storage.getReference(MAIN_NODE)
 
     fun publishAdd(ad: Ad, finishWorkListener: FinishWorkListener) {
-        if (auth.uid != null) db.child(ad.key ?: "empty").child(auth.uid!!).child(AD_NODE)
+        if (auth.uid != null) db.child(ad.key ?: "empty")
+            .child(auth.uid!!).child(AD_NODE)
             .setValue(ad)
             .addOnCompleteListener {
-                finishWorkListener.onFinish()
+
+                val adFilter = AdFilter(ad.time, "${ad.category}_${ad.time}")
+                db.child(ad.key ?: "empty").child(FILTER_NODE)
+                    .setValue(adFilter)
+                    .addOnCompleteListener {
+                        finishWorkListener.onFinish()
+                    }
             }
+
     }
+
 
     fun onFavClick(ad: Ad, listener: FinishWorkListener) {
         if (ad.isFav) {
@@ -59,13 +68,42 @@ class DbManager {
         readDataFromDb(query, readDataCallBack)
     }
 
-    fun getAllAds(readDataCallBack: ReadDataCallBack?) {
-        val query = db.orderByChild(auth.uid + "/ad/price")
+    fun getAllAdsFirstPage(readDataCallBack: ReadDataCallBack?) {
+        val query = db.orderByChild(ALL_TIME_NODE)
+            .limitToLast(
+                ADS_LIMIT
+            )
         readDataFromDb(query, readDataCallBack)
     }
 
+    fun getAllAdsNextPage(time: String,readDataCallBack: ReadDataCallBack?) {
+        val query = db.orderByChild(ALL_TIME_NODE).endBefore(time)
+            .limitToLast(
+                ADS_LIMIT
+            )
+        readDataFromDb(query, readDataCallBack)
+    }
+
+    fun getAllAdsFromCatFirstPage(cat: String, readDataCallBack: ReadDataCallBack?) {
+        val query = db.orderByChild(CAL_TIME_NODE)
+            .startAt(cat).endAt(cat + "_\uf8ff").limitToLast(
+                ADS_LIMIT
+            )
+        readDataFromDb(query, readDataCallBack)
+    }
+
+    fun getAllAdsFromCatNextPage(catTime: String, readDataCallBack: ReadDataCallBack?) {
+        val query = db.orderByChild(CAL_TIME_NODE)
+            .endBefore(catTime).limitToLast(
+                ADS_LIMIT
+            )
+        readDataFromDb(query, readDataCallBack)
+    }
+
+
+
     fun getFavs(readDataCallBack: ReadDataCallBack?) {
-        val query = db.orderByChild( "/favs/${auth.uid}").equalTo(auth.uid)
+        val query = db.orderByChild("/favs/${auth.uid}").equalTo(auth.uid)
         readDataFromDb(query, readDataCallBack)
     }
 
@@ -131,9 +169,13 @@ class DbManager {
 
     companion object {
         const val AD_NODE = "ad"
+        const val FILTER_NODE = "adFilter"
         const val INFO_NODE = "info"
         const val MAIN_NODE = "main"
         const val FAVS_NODE = "favs"
+        const val ALL_TIME_NODE = "/adFilter/time"
+        const val CAL_TIME_NODE = "/adFilter/catTime"
+        const val ADS_LIMIT = 2
     }
 
 }

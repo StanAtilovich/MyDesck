@@ -138,9 +138,11 @@ class EditAdsActivity : AppCompatActivity(), FragmentCloseInterface {
                 "empty",
                 "empty",
                 dbManager.db.push().key,
-                dbManager.auth.uid, "0",
+                dbManager.auth.uid,
+                System.currentTimeMillis().toString(),
+                "0",
 
-                )
+            )
         }
         return ad
     }
@@ -177,13 +179,13 @@ class EditAdsActivity : AppCompatActivity(), FragmentCloseInterface {
     }
 
     private fun uploadAllImages() {
-        if (imageAdapter.mainArray.size == imageIndex){
+        if (imageAdapter.mainArray.size == imageIndex) {
             dbManager.publishAdd(ad!!, onPublishFinish())
             return
         }
         val byteArray = prepareImageByArray(imageAdapter.mainArray[imageIndex])
         uploadImage(byteArray) {
-           // dbManager.publishAdd(ad!!, onPublishFinish())
+            // dbManager.publishAdd(ad!!, onPublishFinish())
             nextImage(it.result.toString())
         }
     }

@@ -3,17 +3,25 @@
     <style name="Base.Theme.MyDesck" parent="Theme.Material3.DayNight.NoActionBar">
         <!-- Customize your light theme here. -->
         <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
-   <item name="android:windowFullscreen">true</item>
+        <item name="android:windowFullscreen">true</item>
     </style>
 
     <style name="Theme.MyDesck" parent="Base.Theme.MyDesck" />
-    <style name="ActionBarCustom" >
+
+    <style name="ActionBarCustom">
         <item name="android:textColorSecondary">@color/green</item>
     </style>
 
     <style name="ToolbarMainStyle" parent="Theme.AppCompat.Light.DarkActionBar">
         <item name="colorControlNormal">@color/green</item>
         <item name="fontFamily">sans-serif-condensed</item>
+    </style>
+
+    <style name="Base.Theme.Filter" parent="Theme.MaterialComponents.Light">
+        <item name="colorPrimary">@color/white</item>
+        <item name="colorOnPrimary">@color/green</item>
+        <item name="colorPrimaryVariant">@color/white</item>
+        <item name="android:windowFullscreen">true</item>
     </style>
 
 </resources>

@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.text.SpannableString
 import android.text.style.ForegroundColorSpan
 import android.util.Log
+import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.ImageView
@@ -29,11 +30,11 @@ import com.squareup.picasso.Picasso
 import ru.stan.mydesck.accountHelper.AccountHelper
 import ru.stan.mydesck.act.DescriptionActivity
 import ru.stan.mydesck.act.EditAdsActivity
+import ru.stan.mydesck.act.FilterActivity
 import ru.stan.mydesck.adapters.AdsRcAdapter
 import ru.stan.mydesck.databinding.ActivityMainBinding
 import ru.stan.mydesck.dialogHelper.DialogConst
 import ru.stan.mydesck.dialogHelper.DialogHelper
-import ru.stan.mydesck.dialogHelper.GoogleAcCounst
 import ru.stan.mydesck.model.Ad
 import ru.stan.mydesck.viewModel.FirebaseViewModel
 
@@ -42,10 +43,14 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     AdsRcAdapter.Listener {
     private lateinit var tvAccount: TextView
     private lateinit var imAccount: ImageView
+    private var curentCategory: String? = null
+    private var filter: String = "empty"
+    private var clearUpdate: Boolean = true
     private lateinit var binding: ActivityMainBinding
     private val dialogHelper = DialogHelper(this)
     val mAuth = Firebase.auth
     lateinit var googleSingInLauncher: ActivityResultLauncher<Intent>
+    lateinit var filterLauncher: ActivityResultLauncher<Intent>
     private val firebaseViewModel: FirebaseViewModel by viewModels()
     val adapter = AdsRcAdapter(this)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -55,11 +60,26 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         init()
         initRecyclerView()
         initViewModel()
-        firebaseViewModel.loadAllAds()
         bottomMenuClick()
         scrollListener()
+        onActivityResultFilter()
     }
 
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.mine_menu, menu )
+        return super.onCreateOptionsMenu(menu)
+    }
+
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        if (item.itemId == R.id.id_filter) {
+            val i = Intent(this@MainActivity, FilterActivity::class.java).apply {
+                putExtra(FilterActivity.FILTER_KEY, filter)
+            }
+            filterLauncher.launch(i)
+        }
+        return super.onOptionsItemSelected(item)
+    }
 
     private fun onActivityResult() {
         googleSingInLauncher =
@@ -76,6 +96,14 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             }
     }
 
+    private fun onActivityResultFilter(){
+       filterLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()){
+           if (it.resultCode == RESULT_OK){
+               filter = it.data?.getStringExtra(FilterActivity.FILTER_KEY)!!
+               Log.d("MyLog", "Filter: $filter ")
+           }
+       }
+    }
 
     override fun onStart() {
         super.onStart()
@@ -90,6 +118,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
     private fun bottomMenuClick() = with(binding) {
         mainContent.bNavView.setOnNavigationItemSelectedListener { item ->
+            clearUpdate = true
             when (item.itemId) {
                 R.id.id_new_ad -> {
                     val i = Intent(this@MainActivity, EditAdsActivity::class.java)
@@ -106,7 +135,8 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                 }
 
                 R.id.id_home -> {
-                    firebaseViewModel.loadAllAds()
+                    curentCategory = getString(R.string.fev)
+                    firebaseViewModel.loadAllAdsFirstPage()
                     mainContent.toolbar.title = getString(R.string.fev)
                 }
             }
@@ -117,12 +147,32 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
     private fun initViewModel() {
         firebaseViewModel.liveAdsData.observe(this) {
-            adapter.updateAdapter(it)
-            binding.mainContent.tvEmpty.visibility = if (it.isEmpty()) View.VISIBLE else View.GONE
+            val list = getAdsByCategory(it)
+            if (!clearUpdate) {
+                adapter.updateAdapter(list)
+            } else {
+                adapter.updateAdapterWithClear(list)
+            }
+            binding.mainContent.tvEmpty.visibility =
+                if (adapter.itemCount == 0) View.VISIBLE else View.GONE
         }
     }
 
+    private fun getAdsByCategory(list: ArrayList<Ad>): ArrayList<Ad> {
+        val tempList = ArrayList<Ad>()
+        tempList.addAll(list)
+        if (curentCategory != getString(R.string.fev)) {
+            tempList.clear()
+            list.forEach {
+                if (curentCategory == it.category) tempList.add(it)
+            }
+        }
+        tempList.reverse()
+        return tempList
+    }
+
     private fun init() {
+        curentCategory = getString(R.string.fev)
         setSupportActionBar(binding.mainContent.toolbar)
         onActivityResult()
         navViewSettings()
@@ -146,25 +196,26 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     }
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
+        clearUpdate = true
         when (item.itemId) {
             R.id.id_my_ads -> {
                 Toast.makeText(this, "id_my_ads", Toast.LENGTH_LONG).show()
             }
 
             R.id.id_car -> {
-                Toast.makeText(this, "id_car", Toast.LENGTH_LONG).show()
+                getAdsFromCat(getString(R.string.ad_car))
             }
 
             R.id.id_pc -> {
-                Toast.makeText(this, "id_pc", Toast.LENGTH_LONG).show()
+                getAdsFromCat(getString(R.string.ad_pc))
             }
 
             R.id.id_smartphones -> {
-                Toast.makeText(this, "id_smartphones", Toast.LENGTH_LONG).show()
+                getAdsFromCat(getString(R.string.ad_smartphones))
             }
 
             R.id.id_dm -> {
-                Toast.makeText(this, "id_dm ", Toast.LENGTH_LONG).show()
+                getAdsFromCat(getString(R.string.ad_dm))
             }
 
             R.id.id_sing_up -> {
@@ -189,6 +240,11 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         return true
     }
 
+    private fun getAdsFromCat(cat: String) {
+        curentCategory = cat
+        firebaseViewModel.loadAllAdsFromCat(cat)
+    }
+
     fun uiUpdate(user: FirebaseUser?) {
 
         if (user == null) {
@@ -206,7 +262,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             Picasso.get().load(user.photoUrl).into(imAccount)
         }
     }
-
 
 
     override fun onDeleteItem(ad: Ad) {
@@ -229,38 +284,54 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         val adsCat = menu.findItem(R.id.adsCat)
         val spanAdsCat = SpannableString(adsCat.title)
         spanAdsCat.setSpan(
-                ForegroundColorSpan(
-                    ContextCompat.getColor(
-                        this@MainActivity,
-                        R.color.red
-                    )
-                ), 0, adsCat.title!!.length, 0
-            )
+            ForegroundColorSpan(
+                ContextCompat.getColor(
+                    this@MainActivity,
+                    R.color.red
+                )
+            ), 0, adsCat.title!!.length, 0
+        )
         adsCat.title = spanAdsCat
 
         val acCat = menu.findItem(R.id.acCat)
         val spanAcCat = SpannableString(acCat.title)
         spanAcCat.setSpan(
-                ForegroundColorSpan(
-                    ContextCompat.getColor(
-                        this@MainActivity,
-                        R.color.red
-                    )
-                ), 0, acCat.title!!.length, 0
-            )
+            ForegroundColorSpan(
+                ContextCompat.getColor(
+                    this@MainActivity,
+                    R.color.red
+                )
+            ), 0, acCat.title!!.length, 0
+        )
         acCat.title = spanAcCat
     }
 
-    private fun scrollListener() = with(binding.mainContent){
-        rcView.addOnScrollListener(object : RecyclerView.OnScrollListener(){
+    private fun scrollListener() = with(binding.mainContent) {
+        rcView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrollStateChanged(rcView: RecyclerView, newState: Int) {
                 super.onScrollStateChanged(rcView, newState)
                 if (!rcView.canScrollVertically(SCROOL_DONE)
-                    && newState == RecyclerView.SCROLL_STATE_IDLE){
-                    Log.d("MyLog", "неможет скролировать вниз")
+                    && newState == RecyclerView.SCROLL_STATE_IDLE
+                ) {
+                    clearUpdate = false
+                    val adsList = firebaseViewModel.liveAdsData.value!!
+                    if (adsList.isNotEmpty()) {
+                        getAdsFromCat(adsList)
+                    }
                 }
             }
         })
+    }
+
+    private fun getAdsFromCat(adsList: ArrayList<Ad>) {
+        adsList[0].let {
+            if (curentCategory == getString(R.string.fev)) {
+                firebaseViewModel.loadAllAdsNextPage(it.time)
+            } else {
+                val catTime = "${it.category}_${it.time}"
+                firebaseViewModel.loadAllAdsFromCatNextPage(catTime)
+            }
+        }
     }
 
     companion object {

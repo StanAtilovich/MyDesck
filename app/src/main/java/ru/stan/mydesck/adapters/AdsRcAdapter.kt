@@ -33,6 +33,18 @@ class AdsRcAdapter(val act: MainActivity) : RecyclerView.Adapter<AdsRcAdapter.Ad
 
     @SuppressLint("NotifyDataSetChanged")
     fun updateAdapter(newList: List<Ad>) {
+        val tempArray = ArrayList<Ad>()
+        tempArray.addAll(arrayList)
+        tempArray.addAll(newList)
+        val diffUtil = DiffUtil.calculateDiff(DiffUtilHelper(arrayList, tempArray))
+        diffUtil.dispatchUpdatesTo(this)
+        arrayList.clear()
+        arrayList.addAll(tempArray)
+
+    }
+
+    @SuppressLint("NotifyDataSetChanged")
+    fun updateAdapterWithClear(newList: List<Ad>) {
         val diffUtil = DiffUtil.calculateDiff(DiffUtilHelper(arrayList, newList))
         diffUtil.dispatchUpdatesTo(this)
         arrayList.clear()

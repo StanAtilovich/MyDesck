@@ -8,12 +8,34 @@ import ru.stan.mydesck.model.DbManager
 class FirebaseViewModel : ViewModel() {
     private val dbManager = DbManager()
     val liveAdsData = MutableLiveData<ArrayList<Ad>>()
-    fun loadAllAds() {
-        dbManager.getAllAds(object : DbManager.ReadDataCallBack {
+    fun loadAllAdsFirstPage() {
+        dbManager.getAllAdsFirstPage(object : DbManager.ReadDataCallBack {
             override fun readData(list: ArrayList<Ad>) {
                 liveAdsData.value = list
             }
+        })
+    }
 
+    fun loadAllAdsNextPage(time: String) {
+        dbManager.getAllAdsNextPage(time, object : DbManager.ReadDataCallBack {
+            override fun readData(list: ArrayList<Ad>) {
+                liveAdsData.value = list
+            }
+        })
+    }
+    fun loadAllAdsFromCat(cat: String) {
+        dbManager.getAllAdsFromCatFirstPage(cat,object : DbManager.ReadDataCallBack {
+            override fun readData(list: ArrayList<Ad>) {
+                liveAdsData.value = list
+            }
+        })
+    }
+
+    fun loadAllAdsFromCatNextPage(catTime: String) {
+        dbManager.getAllAdsFromCatNextPage(catTime,object : DbManager.ReadDataCallBack {
+            override fun readData(list: ArrayList<Ad>) {
+                liveAdsData.value = list
+            }
         })
     }
 
