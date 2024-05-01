@@ -36,6 +36,7 @@ import ru.stan.mydesck.databinding.ActivityMainBinding
 import ru.stan.mydesck.dialogHelper.DialogConst
 import ru.stan.mydesck.dialogHelper.DialogHelper
 import ru.stan.mydesck.model.Ad
+import ru.stan.mydesck.utils.FilterManager
 import ru.stan.mydesck.viewModel.FirebaseViewModel
 
 
@@ -101,6 +102,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
            if (it.resultCode == RESULT_OK){
                filter = it.data?.getStringExtra(FilterActivity.FILTER_KEY)!!
                Log.d("MyLog", "Filter: $filter ")
+               Log.d("MyLog", "getFilter: ${FilterManager.getFilter(filter)} ")
            }
        }
     }

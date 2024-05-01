@@ -9,6 +9,7 @@ import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.ktx.storage
+import ru.stan.mydesck.utils.FilterManager
 
 
 class DbManager {
@@ -22,7 +23,7 @@ class DbManager {
             .setValue(ad)
             .addOnCompleteListener {
 
-                val adFilter = AdFilter(ad.time, "${ad.category}_${ad.time}")
+                val adFilter = FilterManager.createFilter(ad)
                 db.child(ad.key ?: "empty").child(FILTER_NODE)
                     .setValue(adFilter)
                     .addOnCompleteListener {
@@ -174,7 +175,7 @@ class DbManager {
         const val MAIN_NODE = "main"
         const val FAVS_NODE = "favs"
         const val ALL_TIME_NODE = "/adFilter/time"
-        const val CAL_TIME_NODE = "/adFilter/catTime"
+        const val CAL_TIME_NODE = "/adFilter/cat_time"
         const val ADS_LIMIT = 2
     }
 
