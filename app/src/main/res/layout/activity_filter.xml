@@ -176,6 +176,16 @@
                         android:text="Применить фильтр"
                         android:textColor="@color/green" />
 
+                    <Button
+                        android:id="@+id/btClear"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="10dp"
+                        android:backgroundTint="@color/white"
+                        android:onClick="onClickPublish"
+                        android:text="Очистить фильтр"
+                        android:textColor="@color/green" />
+
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
 

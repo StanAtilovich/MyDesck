@@ -69,15 +69,29 @@ class DbManager {
         readDataFromDb(query, readDataCallBack)
     }
 
-    fun getAllAdsFirstPage(readDataCallBack: ReadDataCallBack?) {
-        val query = db.orderByChild(ALL_TIME_NODE)
-            .limitToLast(
-                ADS_LIMIT
-            )
+    fun getAllAdsFirstPage(filter: String, readDataCallBack: ReadDataCallBack?) {
+        val query = if (filter.isEmpty()) {
+            db.orderByChild(ALL_TIME_NODE)
+                .limitToLast(
+                    ADS_LIMIT
+                )
+        } else {
+            getAllAdsByFilterFirstPage(filter)
+        }
         readDataFromDb(query, readDataCallBack)
     }
 
-    fun getAllAdsNextPage(time: String,readDataCallBack: ReadDataCallBack?) {
+    fun getAllAdsByFilterFirstPage(tempFilter: String): Query {
+        val orderBy = tempFilter.split("|")[0]
+        val filter = tempFilter.split("|")[1]
+        return db.orderByChild("/adFilter/$orderBy")
+            .startAt(filter).endAt(filter + "\uf8ff").limitToLast(
+                ADS_LIMIT
+            )
+
+    }
+
+    fun getAllAdsNextPage(time: String, readDataCallBack: ReadDataCallBack?) {
         val query = db.orderByChild(ALL_TIME_NODE).endBefore(time)
             .limitToLast(
                 ADS_LIMIT
@@ -85,12 +99,29 @@ class DbManager {
         readDataFromDb(query, readDataCallBack)
     }
 
-    fun getAllAdsFromCatFirstPage(cat: String, readDataCallBack: ReadDataCallBack?) {
-        val query = db.orderByChild(CAL_TIME_NODE)
-            .startAt(cat).endAt(cat + "_\uf8ff").limitToLast(
+    fun getAllAdsFromCatFirstPage(
+        cat: String,
+        filter: String,
+        readDataCallBack: ReadDataCallBack?
+    ) {
+        val query = if (filter.isEmpty()) {
+            db.orderByChild(CAL_TIME_NODE)
+                .startAt(cat).endAt(cat + "_\uf8ff").limitToLast(
+                    ADS_LIMIT
+                )
+        } else {
+            getAllAdsFromCatByFilterFirstPage(cat,filter)
+        }
+        readDataFromDb(query, readDataCallBack)
+    }
+
+    fun getAllAdsFromCatByFilterFirstPage(cat: String, tempFilter: String): Query {
+        val orderBy = "cat_" + tempFilter.split("|")[0]
+        val filter = cat + "_" + tempFilter.split("|")[1]
+        return db.orderByChild("/adFilter/$orderBy")
+            .startAt(filter).endAt(filter + "\uf8ff").limitToLast(
                 ADS_LIMIT
             )
-        readDataFromDb(query, readDataCallBack)
     }
 
     fun getAllAdsFromCatNextPage(catTime: String, readDataCallBack: ReadDataCallBack?) {
@@ -100,7 +131,6 @@ class DbManager {
             )
         readDataFromDb(query, readDataCallBack)
     }
-
 
 
     fun getFavs(readDataCallBack: ReadDataCallBack?) {

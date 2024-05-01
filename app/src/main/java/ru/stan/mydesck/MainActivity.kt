@@ -54,6 +54,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     lateinit var filterLauncher: ActivityResultLauncher<Intent>
     private val firebaseViewModel: FirebaseViewModel by viewModels()
     val adapter = AdsRcAdapter(this)
+    private var filterDb: String = ""
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
@@ -67,7 +68,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        menuInflater.inflate(R.menu.mine_menu, menu )
+        menuInflater.inflate(R.menu.mine_menu, menu)
         return super.onCreateOptionsMenu(menu)
     }
 
@@ -97,14 +98,19 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             }
     }
 
-    private fun onActivityResultFilter(){
-       filterLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()){
-           if (it.resultCode == RESULT_OK){
-               filter = it.data?.getStringExtra(FilterActivity.FILTER_KEY)!!
-               Log.d("MyLog", "Filter: $filter ")
-               Log.d("MyLog", "getFilter: ${FilterManager.getFilter(filter)} ")
-           }
-       }
+    private fun onActivityResultFilter() {
+        filterLauncher =
+            registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+                if (it.resultCode == RESULT_OK) {
+                    filter = it.data?.getStringExtra(FilterActivity.FILTER_KEY)!!
+                    // Log.d("MyLog", "Filter: $filter ")
+                    // Log.d("MyLog", "getFilter: ${FilterManager.getFilter(filter)} ")
+                    filterDb = FilterManager.getFilter(filter)
+                } else if (it.resultCode == RESULT_CANCELED) {
+                    filterDb = ""
+                    filter = "empty"
+                }
+            }
     }
 
     override fun onStart() {
@@ -138,7 +144,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
                 R.id.id_home -> {
                     curentCategory = getString(R.string.fev)
-                    firebaseViewModel.loadAllAdsFirstPage()
+                    firebaseViewModel.loadAllAdsFirstPage(filterDb)
                     mainContent.toolbar.title = getString(R.string.fev)
                 }
             }
@@ -244,7 +250,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
     private fun getAdsFromCat(cat: String) {
         curentCategory = cat
-        firebaseViewModel.loadAllAdsFromCat(cat)
+        firebaseViewModel.loadAllAdsFromCat(cat, filterDb)
     }
 
     fun uiUpdate(user: FirebaseUser?) {

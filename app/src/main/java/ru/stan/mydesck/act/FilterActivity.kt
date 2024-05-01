@@ -22,6 +22,7 @@ class FilterActivity : AppCompatActivity() {
         onClickSelectCountry()
         onClickSelectCity()
         onClickDone()
+        onClickClear()
         getFilter()
     }
 
@@ -73,6 +74,19 @@ class FilterActivity : AppCompatActivity() {
             finish()
         }
     }
+
+    private fun onClickClear() = with(binding) {
+        btClear.setOnClickListener {
+            tvCountry.text = getString(R.string.select_country)
+            tvCity.text = getString(R.string.select_city)
+            editIndex.setText("")
+            checkBoxWithSend.isChecked = false
+
+            setResult(RESULT_CANCELED)
+        }
+
+    }
+
 
     private fun createFilter(): String = with(binding) {
         val sBuilder = StringBuilder()
