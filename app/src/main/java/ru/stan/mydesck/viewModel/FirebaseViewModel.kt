@@ -16,8 +16,8 @@ class FirebaseViewModel : ViewModel() {
         })
     }
 
-    fun loadAllAdsNextPage(time: String) {
-        dbManager.getAllAdsNextPage(time, object : DbManager.ReadDataCallBack {
+    fun loadAllAdsNextPage(time: String, filter: String) {
+        dbManager.getAllAdsNextPage(time,filter, object : DbManager.ReadDataCallBack {
             override fun readData(list: ArrayList<Ad>) {
                 liveAdsData.value = list
             }
@@ -31,8 +31,8 @@ class FirebaseViewModel : ViewModel() {
         })
     }
 
-    fun loadAllAdsFromCatNextPage(catTime: String) {
-        dbManager.getAllAdsFromCatNextPage(catTime,object : DbManager.ReadDataCallBack {
+    fun loadAllAdsFromCatNextPage(cat: String,time: String, filter: String) {
+        dbManager.getAllAdsFromCatNextPage(cat,time,filter,object : DbManager.ReadDataCallBack {
             override fun readData(list: ArrayList<Ad>) {
                 liveAdsData.value = list
             }

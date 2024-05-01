@@ -1,6 +1,7 @@
 package ru.stan.mydesck.model
 
 
+import android.util.Log
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
@@ -88,15 +89,33 @@ class DbManager {
             .startAt(filter).endAt(filter + "\uf8ff").limitToLast(
                 ADS_LIMIT
             )
-
     }
 
-    fun getAllAdsNextPage(time: String, readDataCallBack: ReadDataCallBack?) {
-        val query = db.orderByChild(ALL_TIME_NODE).endBefore(time)
-            .limitToLast(
+    private fun getAllAdsByFilterNextPage(
+        tempFilter: String,
+        time: String,
+        readDataCallBack: ReadDataCallBack?
+    ) {
+        val orderBy = tempFilter.split("|")[0]
+        val filter = tempFilter.split("|")[1]
+        val query = db.orderByChild("/adFilter/$orderBy")
+            .endBefore(filter + "_$time").limitToLast(
                 ADS_LIMIT
             )
-        readDataFromDb(query, readDataCallBack)
+        readNextPageFromDb(query, filter, orderBy, readDataCallBack)
+    }
+
+    fun getAllAdsNextPage(time: String, filter: String, readDataCallBack: ReadDataCallBack?) {
+        if (filter.isEmpty()) {
+            val query = db.orderByChild(ALL_TIME_NODE).endBefore(time)
+                .limitToLast(
+                    ADS_LIMIT
+                )
+            readDataFromDb(query, readDataCallBack)
+        } else {
+            getAllAdsByFilterNextPage(filter, time, readDataCallBack)
+        }
+
     }
 
     fun getAllAdsFromCatFirstPage(
@@ -110,7 +129,7 @@ class DbManager {
                     ADS_LIMIT
                 )
         } else {
-            getAllAdsFromCatByFilterFirstPage(cat,filter)
+            getAllAdsFromCatByFilterFirstPage(cat, filter)
         }
         readDataFromDb(query, readDataCallBack)
     }
@@ -124,12 +143,37 @@ class DbManager {
             )
     }
 
-    fun getAllAdsFromCatNextPage(catTime: String, readDataCallBack: ReadDataCallBack?) {
-        val query = db.orderByChild(CAL_TIME_NODE)
-            .endBefore(catTime).limitToLast(
+    fun getAllAdsFromCatNextPage(
+        cat: String,
+        time: String,
+        filter: String,
+        readDataCallBack: ReadDataCallBack?
+    ) {
+        if (filter.isEmpty()) {
+            val query = db.orderByChild(CAL_TIME_NODE)
+                .endBefore(cat + "_" + time).limitToLast(
+                    ADS_LIMIT
+                )
+            readDataFromDb(query, readDataCallBack)
+        } else {
+            getAllAdsFromCatByFilterNextPage(cat, time, filter, readDataCallBack)
+        }
+
+    }
+
+    fun getAllAdsFromCatByFilterNextPage(
+        cat: String,
+        time: String,
+        tempFilter: String,
+        readDataCallBack: ReadDataCallBack?
+    ) {
+        val orderBy = "cat_" + tempFilter.split("|")[0]
+        val filter = cat + "_" + tempFilter.split("|")[1]
+        val query = db.orderByChild("/adFilter/$orderBy")
+            .endBefore(filter + "_" + time).limitToLast(
                 ADS_LIMIT
             )
-        readDataFromDb(query, readDataCallBack)
+        readNextPageFromDb(query, filter, orderBy, readDataCallBack)
     }
 
 
@@ -162,6 +206,48 @@ class DbManager {
                         ad?.emailCounter = infoItem?.emailsCounter ?: "0"
                         ad?.callsCounter = infoItem?.callsCounter ?: "0"
                         if (ad != null) adArray.add(ad!!)
+
+                    }
+                    readDataCallBack?.readData(adArray)
+                }
+
+                override fun onCancelled(error: DatabaseError) {
+                }
+
+            }
+        )
+    }
+
+    private fun readNextPageFromDb(
+        query: Query,
+        filter: String,
+        orderBy: String,
+        readDataCallBack: ReadDataCallBack?
+    ) {
+        query.addListenerForSingleValueEvent(
+
+            object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    val adArray = ArrayList<Ad>()
+                    for (item in snapshot.children) {
+                        var ad: Ad? = null
+                        item.children.forEach {
+                            if (ad == null) ad = it.child(AD_NODE).getValue(Ad::class.java)
+                        }
+                        val infoItem = item.child(INFO_NODE).getValue(InfoItem::class.java)
+                        val filterNodeValue = item.child(INFO_NODE).child(orderBy).value.toString()
+                        Log.d("MyLog", "Filter value:$filterNodeValue ")
+                        val favCounter = item.child(FAVS_NODE).childrenCount
+                        val isFav = auth.uid?.let {
+                            item.child(FAVS_NODE).child(it).getValue(String::class.java)
+                        }
+                        ad?.isFav = isFav != null
+                        ad?.favCounter = favCounter.toString()
+
+                        ad?.viewCounter = infoItem?.viewCounter ?: "0"
+                        ad?.emailCounter = infoItem?.emailsCounter ?: "0"
+                        ad?.callsCounter = infoItem?.callsCounter ?: "0"
+                        if (ad != null && filterNodeValue.startsWith(filter)) adArray.add(ad!!)
 
                     }
                     readDataCallBack?.readData(adArray)
