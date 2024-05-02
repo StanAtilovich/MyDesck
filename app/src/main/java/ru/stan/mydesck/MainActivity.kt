@@ -1,7 +1,7 @@
 package ru.stan.mydesck
 
-import android.app.Activity
 import android.content.Intent
+import android.content.SharedPreferences
 import android.os.Bundle
 import android.text.SpannableString
 import android.text.style.ForegroundColorSpan
@@ -40,6 +40,7 @@ import ru.stan.mydesck.dialogHelper.DialogConst
 import ru.stan.mydesck.dialogHelper.DialogHelper
 import ru.stan.mydesck.model.Ad
 import ru.stan.mydesck.utils.AppMainState
+import ru.stan.mydesck.utils.BillingManager
 import ru.stan.mydesck.utils.FilterManager
 import ru.stan.mydesck.viewModel.FirebaseViewModel
 
@@ -59,14 +60,24 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     private val firebaseViewModel: FirebaseViewModel by viewModels()
     val adapter = AdsRcAdapter(this)
     private var filterDb: String = ""
+    private var pref: SharedPreferences? = null
+    private var isPremium = false
+    private var bManager: BillingManager? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        (application as AppMainState).showAdIfAvailable(this){
-
+        pref = getSharedPreferences(BillingManager.MAIN_PREF, MODE_PRIVATE)
+        isPremium = pref?.getBoolean(BillingManager.REMOVE_ADS_PREF, false)!!
+        isPremium = true
+        if (isPremium) {
+            (application as AppMainState).showAdIfAvailable(this) {
+            }
+            initAds()
+        } else {
+            binding.mainContent.adView2.visibility = View.GONE
         }
-        initAds()
+
         init()
         initRecyclerView()
         initViewModel()
@@ -140,6 +151,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     override fun onDestroy() {
         super.onDestroy()
         binding.mainContent.adView2.destroy()
+        bManager?.closeConnection()
     }
 
     private fun initAds() {
@@ -245,6 +257,11 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
             R.id.id_smartphones -> {
                 getAdsFromCat(getString(R.string.ad_smartphones))
+            }
+
+            R.id.id_remove_ads -> {
+                bManager = BillingManager(this)
+                bManager?.startConnection()
             }
 
             R.id.id_dm -> {

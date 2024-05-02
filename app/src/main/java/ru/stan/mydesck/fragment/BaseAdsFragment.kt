@@ -2,8 +2,10 @@ package ru.stan.mydesck.fragment
 
 import android.app.Activity
 import android.content.Context
+import android.content.SharedPreferences
 import android.os.Bundle
 import android.view.View
+import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import com.google.android.gms.ads.AdError
 import com.google.android.gms.ads.AdRequest
@@ -13,20 +15,29 @@ import com.google.android.gms.ads.MobileAds
 import com.google.android.gms.ads.interstitial.InterstitialAd
 import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback
 import ru.stan.mydesck.R
+import ru.stan.mydesck.utils.BillingManager
 
 open class BaseAdsFragment : Fragment(), InterAdsClose {
     lateinit var adView: AdView
     var inTerAd: InterstitialAd? = null
+    private var pref: SharedPreferences? = null
+    private var isPremium = false
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        initAds()
+        pref = activity?.getSharedPreferences(BillingManager.MAIN_PREF, AppCompatActivity.MODE_PRIVATE)
+        isPremium = pref?.getBoolean(BillingManager.REMOVE_ADS_PREF, false)!!
+        isPremium = true
+        if (!isPremium){
+            initAds()
+            loadInterAd()
+        }
+        else {
+            adView.visibility = View.GONE
+        }
+
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        loadInterAd()
-    }
 
     override fun onResume() {
         super.onResume()

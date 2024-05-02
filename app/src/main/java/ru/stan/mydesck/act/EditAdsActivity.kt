@@ -100,7 +100,7 @@ class EditAdsActivity : AppCompatActivity(), FragmentCloseInterface {
     fun onClickPublish(view: View) {
         ad = fillAd()
         if (isEditState) {
-            ad?.copy(key = ad?.key)?.let { dbManager.publishAdd(it, onPublishFinish()) }
+            dbManager.publishAdd(ad!!, onPublishFinish())
         } else {
             if (imageAdapter.mainArray.isNotEmpty()) {
                 uploadAllImages()
@@ -121,9 +121,9 @@ class EditAdsActivity : AppCompatActivity(), FragmentCloseInterface {
     }
 
     private fun fillAd(): Ad {
-        val ad: Ad
+        val adTemp: Ad
         binding.apply {
-            ad = Ad(
+            adTemp = Ad(
                 tvCountry.text.toString(),
                 tvCity.text.toString(),
                 editTell.text.toString(),
@@ -134,17 +134,16 @@ class EditAdsActivity : AppCompatActivity(), FragmentCloseInterface {
                 editPrice.text.toString(),
                 editDiscription.text.toString(),
                 editEmail.text.toString(),
-                "empty",
-                "empty",
-                "empty",
-                dbManager.db.push().key,
+                ad?.mainImage ?: "empty",
+                ad?.image2 ?: "empty",
+                ad?.image3 ?: "empty",
+                ad?.key ?: dbManager.db.push().key,
                 dbManager.auth.uid,
-                System.currentTimeMillis().toString(),
+                ad?.time ?: System.currentTimeMillis().toString(),
                 "0",
-
-            )
+                )
         }
-        return ad
+        return adTemp
     }
 
     @SuppressLint("SuspiciousIndentation")
