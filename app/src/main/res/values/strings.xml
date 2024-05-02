@@ -62,4 +62,6 @@
     <string name="guest">Гость</string>
     <string name="yes">Да</string>
     <string name="no">Нет</string>
+    <string name="timePublish">Время публикации</string>
+
 </resources>

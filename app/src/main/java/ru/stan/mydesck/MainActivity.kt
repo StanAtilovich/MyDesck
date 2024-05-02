@@ -1,5 +1,6 @@
 package ru.stan.mydesck
 
+import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.text.SpannableString
@@ -20,6 +21,8 @@ import androidx.activity.viewModels
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.gms.ads.AdRequest
+import com.google.android.gms.ads.MobileAds
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.common.api.ApiException
 import com.google.android.material.navigation.NavigationView
@@ -36,6 +39,7 @@ import ru.stan.mydesck.databinding.ActivityMainBinding
 import ru.stan.mydesck.dialogHelper.DialogConst
 import ru.stan.mydesck.dialogHelper.DialogHelper
 import ru.stan.mydesck.model.Ad
+import ru.stan.mydesck.utils.AppMainState
 import ru.stan.mydesck.utils.FilterManager
 import ru.stan.mydesck.viewModel.FirebaseViewModel
 
@@ -59,6 +63,10 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        (application as AppMainState).showAdIfAvailable(this){
+
+        }
+        initAds()
         init()
         initRecyclerView()
         initViewModel()
@@ -121,6 +129,23 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     override fun onResume() {
         super.onResume()
         binding.mainContent.bNavView.selectedItemId = R.id.id_home
+        binding.mainContent.adView2.resume()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        binding.mainContent.adView2.pause()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        binding.mainContent.adView2.destroy()
+    }
+
+    private fun initAds() {
+        MobileAds.initialize(this)
+        val adRequest = AdRequest.Builder().build()
+        binding.mainContent.adView2.loadAd(adRequest)
     }
 
 

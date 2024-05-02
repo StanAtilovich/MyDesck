@@ -2,6 +2,7 @@ package ru.stan.mydesck.adapters
 
 import android.annotation.SuppressLint
 import android.content.Intent
+import android.provider.Settings.Global.getString
 import android.view.LayoutInflater
 import android.view.View
 import android.view.View.OnClickListener
@@ -15,12 +16,21 @@ import ru.stan.mydesck.act.DescriptionActivity
 import ru.stan.mydesck.act.EditAdsActivity
 import ru.stan.mydesck.databinding.AdListItemBinding
 import ru.stan.mydesck.model.Ad
+import java.text.SimpleDateFormat
+import java.util.Calendar
+import java.util.Locale
 
 class AdsRcAdapter(val act: MainActivity) : RecyclerView.Adapter<AdsRcAdapter.AdHolder>() {
     val arrayList = ArrayList<Ad>()
+    var timeFormater: SimpleDateFormat? = null
+
+    init {
+        timeFormater = SimpleDateFormat("dd/MM/yyyy - hh:mm:ss", Locale.getDefault())
+    }
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): AdHolder {
         val binding = AdListItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-        return AdHolder(binding, act)
+        return AdHolder(binding, act, timeFormater!!)
     }
 
     override fun onBindViewHolder(holder: AdHolder, position: Int) {
@@ -52,7 +62,11 @@ class AdsRcAdapter(val act: MainActivity) : RecyclerView.Adapter<AdsRcAdapter.Ad
 
     }
 
-    class AdHolder(val binding: AdListItemBinding, val act: MainActivity) :
+    class AdHolder(
+        val binding: AdListItemBinding,
+        val act: MainActivity,
+        val formater: SimpleDateFormat
+    ) :
         RecyclerView.ViewHolder(binding.root) {
 
         fun setData(ad: Ad) = with(binding) {
@@ -61,12 +75,20 @@ class AdsRcAdapter(val act: MainActivity) : RecyclerView.Adapter<AdsRcAdapter.Ad
             tvTitle.text = ad.title
             tvViewCounter.text = ad.viewCounter
             tvFavCounter.text = ad.favCounter
+            val publishTime = "${act.getString( R.string.timePublish)} ${getTimeFromMills(ad.time)}"
+            tvPublishTime.text = publishTime
             Picasso.get().load(ad.mainImage).into(myImageeView)
 
             isFav(ad)
             showEditPanel(isOwner(ad))
             mainOnClick(ad)
 
+        }
+
+        private fun getTimeFromMills(timeMills: String): String {
+            val c = Calendar.getInstance()
+            c.timeInMillis = timeMills.toLong()
+            return formater.format(c.time)
         }
 
         private fun isFav(ad: Ad) = with(binding) {

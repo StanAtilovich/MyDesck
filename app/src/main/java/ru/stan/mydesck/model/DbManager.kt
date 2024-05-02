@@ -82,7 +82,7 @@ class DbManager {
         readDataFromDb(query, readDataCallBack)
     }
 
-    fun getAllAdsByFilterFirstPage(tempFilter: String): Query {
+    private fun getAllAdsByFilterFirstPage(tempFilter: String): Query {
         val orderBy = tempFilter.split("|")[0]
         val filter = tempFilter.split("|")[1]
         return db.orderByChild("/adFilter/$orderBy")
@@ -134,7 +134,7 @@ class DbManager {
         readDataFromDb(query, readDataCallBack)
     }
 
-    fun getAllAdsFromCatByFilterFirstPage(cat: String, tempFilter: String): Query {
+    private fun getAllAdsFromCatByFilterFirstPage(cat: String, tempFilter: String): Query {
         val orderBy = "cat_" + tempFilter.split("|")[0]
         val filter = cat + "_" + tempFilter.split("|")[1]
         return db.orderByChild("/adFilter/$orderBy")
@@ -161,7 +161,7 @@ class DbManager {
 
     }
 
-    fun getAllAdsFromCatByFilterNextPage(
+    private fun getAllAdsFromCatByFilterNextPage(
         cat: String,
         time: String,
         tempFilter: String,

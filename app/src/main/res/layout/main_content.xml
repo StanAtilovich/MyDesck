@@ -27,7 +27,7 @@
         app:layout_constraintBottom_toTopOf="@+id/bNavView"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/toolbar">
+        app:layout_constraintTop_toBottomOf="@+id/adView2">
 
     </androidx.recyclerview.widget.RecyclerView>
 
@@ -52,5 +52,15 @@
         app:layout_constraintBottom_toBottomOf="@+id/rcView"
         app:layout_constraintEnd_toEndOf="@+id/rcView"
         app:layout_constraintStart_toStartOf="@+id/rcView"
+        app:layout_constraintTop_toBottomOf="@+id/toolbar" />
+
+    <com.google.android.gms.ads.AdView
+        android:id="@+id/adView2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:adSize="BANNER"
+        app:adUnitId="@string/adId"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/toolbar" />
 </androidx.constraintlayout.widget.ConstraintLayout>
