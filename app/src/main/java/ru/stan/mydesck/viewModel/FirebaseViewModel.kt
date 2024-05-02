@@ -7,7 +7,7 @@ import ru.stan.mydesck.model.DbManager
 
 class FirebaseViewModel : ViewModel() {
     private val dbManager = DbManager()
-    val liveAdsData = MutableLiveData<ArrayList<Ad>>()
+    val liveAdsData = MutableLiveData<ArrayList<Ad>?>()
     fun loadAllAdsFirstPage(filter: String) {
         dbManager.getAllAdsFirstPage(filter, object : DbManager.ReadDataCallBack {
             override fun readData(list: ArrayList<Ad>) {
@@ -45,7 +45,7 @@ class FirebaseViewModel : ViewModel() {
 
     fun onFavClick(ad: Ad) {
         dbManager.onFavClick(ad, object : DbManager.FinishWorkListener {
-            override fun onFinish() {
+            override fun onFinish(isDone: Boolean) {
                 val updateList = liveAdsData.value
                 val pos = updateList?.indexOf(ad)
                 if (pos != -1) {
@@ -81,7 +81,7 @@ class FirebaseViewModel : ViewModel() {
 
     fun deleteItem(ad: Ad) {
         dbManager.deleteAd(ad, object : DbManager.FinishWorkListener {
-            override fun onFinish() {
+            override fun onFinish(isDone: Boolean) {
                 val updatedList = liveAdsData.value
                 updatedList?.remove(ad)
                 liveAdsData.postValue(updatedList)

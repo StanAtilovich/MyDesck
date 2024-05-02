@@ -150,12 +150,12 @@ class AccountHelper(act: MainActivity) {
         val credential = GoogleAuthProvider.getCredential(token, null)
         act.mAuth.currentUser?.delete()?.addOnCompleteListener { task ->
             if (task.isSuccessful) {
-                act.mAuth.signInWithCredential(credential).addOnCompleteListener { task ->
-                    if (task.isSuccessful) {
+                act.mAuth.signInWithCredential(credential).addOnCompleteListener { task2 ->
+                    if (task2.isSuccessful) {
                         Toast.makeText(act, "sing in done", Toast.LENGTH_LONG).show()
-                        act.uiUpdate(task.result.user)
+                        act.uiUpdate(task2.result.user)
                     } else {
-                        Log.d("MyLog", "singInFirebaseWithGoogle EXCEPTION: ${task.exception} ")
+                        Log.d("MyLog", "singInFirebaseWithGoogle EXCEPTION: ${task2.exception} ")
                     }
                 }
             }

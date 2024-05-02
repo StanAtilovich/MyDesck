@@ -63,5 +63,8 @@
     <string name="yes">Да</string>
     <string name="no">Нет</string>
     <string name="timePublish">Время публикации</string>
+    <string name="thanks">Спасибо за покупку!</string>
+    <string name="canseled">Не удалось совершить покупку!</string>
+    <string name="remove_ads">Удалить рекламу</string>
 
 </resources>

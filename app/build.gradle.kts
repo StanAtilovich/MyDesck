@@ -71,5 +71,8 @@ dependencies {
     implementation ("androidx.lifecycle:lifecycle-runtime-ktx:2.7.0")
     annotationProcessor ("androidx.lifecycle:lifecycle-compiler:2.7.0")
 
+
+    implementation ("com.android.billingclient:billing:6.2.1")
+
 }
 

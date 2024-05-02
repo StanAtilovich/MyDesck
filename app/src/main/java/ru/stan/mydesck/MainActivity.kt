@@ -1,7 +1,7 @@
 package ru.stan.mydesck
 
-import android.app.Activity
 import android.content.Intent
+import android.content.SharedPreferences
 import android.os.Bundle
 import android.text.SpannableString
 import android.text.style.ForegroundColorSpan
@@ -34,12 +34,14 @@ import ru.stan.mydesck.accountHelper.AccountHelper
 import ru.stan.mydesck.act.DescriptionActivity
 import ru.stan.mydesck.act.EditAdsActivity
 import ru.stan.mydesck.act.FilterActivity
+import ru.stan.mydesck.act.showToast
 import ru.stan.mydesck.adapters.AdsRcAdapter
 import ru.stan.mydesck.databinding.ActivityMainBinding
 import ru.stan.mydesck.dialogHelper.DialogConst
 import ru.stan.mydesck.dialogHelper.DialogHelper
 import ru.stan.mydesck.model.Ad
 import ru.stan.mydesck.utils.AppMainState
+import ru.stan.mydesck.utils.BillingManager
 import ru.stan.mydesck.utils.FilterManager
 import ru.stan.mydesck.viewModel.FirebaseViewModel
 
@@ -59,14 +61,24 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     private val firebaseViewModel: FirebaseViewModel by viewModels()
     val adapter = AdsRcAdapter(this)
     private var filterDb: String = ""
+    private var pref: SharedPreferences? = null
+    private var isPremium = false
+    private var bManager: BillingManager? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        (application as AppMainState).showAdIfAvailable(this){
-
+        pref = getSharedPreferences(BillingManager.MAIN_PREF, MODE_PRIVATE)
+        isPremium = pref?.getBoolean(BillingManager.REMOVE_ADS_PREF, false)!!
+        isPremium = true
+        if (isPremium) {
+            (application as AppMainState).showAdIfAvailable(this) {
+            }
+            initAds()
+        } else {
+            binding.mainContent.adView2.visibility = View.GONE
         }
-        initAds()
+
         init()
         initRecyclerView()
         initViewModel()
@@ -140,6 +152,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     override fun onDestroy() {
         super.onDestroy()
         binding.mainContent.adView2.destroy()
+        bManager?.closeConnection()
     }
 
     private fun initAds() {
@@ -150,12 +163,20 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
 
     private fun bottomMenuClick() = with(binding) {
-        mainContent.bNavView.setOnNavigationItemSelectedListener { item ->
+        mainContent.bNavView.setOnItemSelectedListener { item ->
             clearUpdate = true
             when (item.itemId) {
                 R.id.id_new_ad -> {
-                    val i = Intent(this@MainActivity, EditAdsActivity::class.java)
-                    startActivity(i)
+                    if (mAuth.currentUser != null) {
+                        if (!mAuth.currentUser?.isAnonymous!!) {
+                            val i = Intent(this@MainActivity, EditAdsActivity::class.java)
+                            startActivity(i)
+                        } else {
+                            showToast(" Гость не может публиковать обьявления!")
+                        }
+                    } else {
+                        showToast("Ошибка регистрации")
+                    }
                 }
 
                 R.id.id_my_ads -> {
@@ -180,11 +201,15 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
     private fun initViewModel() {
         firebaseViewModel.liveAdsData.observe(this) {
-            val list = getAdsByCategory(it)
+            val list = it?.let { it1 -> getAdsByCategory(it1) }
             if (!clearUpdate) {
-                adapter.updateAdapter(list)
+                if (list != null) {
+                    adapter.updateAdapter(list)
+                }
             } else {
-                adapter.updateAdapterWithClear(list)
+                if (list != null) {
+                    adapter.updateAdapterWithClear(list)
+                }
             }
             binding.mainContent.tvEmpty.visibility =
                 if (adapter.itemCount == 0) View.VISIBLE else View.GONE
@@ -245,6 +270,11 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
             R.id.id_smartphones -> {
                 getAdsFromCat(getString(R.string.ad_smartphones))
+            }
+
+            R.id.id_remove_ads -> {
+                bManager = BillingManager(this)
+                bManager?.startConnection()
             }
 
             R.id.id_dm -> {

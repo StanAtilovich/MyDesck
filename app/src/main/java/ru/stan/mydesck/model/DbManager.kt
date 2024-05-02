@@ -28,7 +28,7 @@ class DbManager {
                 db.child(ad.key ?: "empty").child(FILTER_NODE)
                     .setValue(adFilter)
                     .addOnCompleteListener {
-                        finishWorkListener.onFinish()
+                        finishWorkListener.onFinish(it.isSuccessful)
                     }
             }
 
@@ -48,7 +48,7 @@ class DbManager {
             auth.uid?.let { uid ->
                 db.child(it)
                     .child(FAVS_NODE).child(uid).setValue(uid).addOnCompleteListener {
-                        if (it.isSuccessful) listener.onFinish()
+                        if (it.isSuccessful) listener.onFinish(true)
                     }
             }
         }
@@ -59,7 +59,7 @@ class DbManager {
             auth.uid?.let { uid ->
                 db.child(it)
                     .child(FAVS_NODE).child(uid).removeValue().addOnCompleteListener {
-                        if (it.isSuccessful) listener.onFinish()
+                        if (it.isSuccessful) listener.onFinish(true)
                     }
             }
         }
@@ -271,8 +271,35 @@ class DbManager {
 
     fun deleteAd(ad: Ad, listener: FinishWorkListener) {
         if (ad.key == null || ad.uid == null) return
-        db.child(ad.key).child(ad.uid).removeValue().addOnCompleteListener {
-            if (it.isSuccessful) listener.onFinish()
+        val map = mapOf(
+            "/adFilter" to null,
+            "/favs" to null,
+            "/info" to null,
+            "/${ad.uid}" to null
+        )
+        db.child(ad.key).updateChildren(map).addOnCompleteListener {
+            if (it.isSuccessful) deleteImagesFromStorage(ad, 0, listener)
+        }
+    }
+
+    private fun deleteImagesFromStorage(ad: Ad, index: Int, listener: FinishWorkListener) {
+        val imageList = listOf(ad.mainImage, ad.image2, ad.image3)
+        if (ad.mainImage == "empty") {
+            listener.onFinish(true)
+            return
+        }
+        dbStorage.storage.getReferenceFromUrl(imageList[index]).delete().addOnCompleteListener {
+            if (it.isSuccessful) {
+                if (imageList.size > index + 1) {
+                    if (imageList[index + 1] != "empty") {
+                        deleteImagesFromStorage(ad, index + 1, listener)
+                    } else {
+                        listener.onFinish(true)
+                    }
+                } else {
+                    listener.onFinish(true)
+                }
+            }
         }
     }
 
@@ -281,7 +308,7 @@ class DbManager {
     }
 
     interface FinishWorkListener {
-        fun onFinish()
+        fun onFinish(isDone: Boolean)
     }
 
     companion object {
