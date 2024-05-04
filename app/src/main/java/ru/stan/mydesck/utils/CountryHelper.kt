@@ -9,7 +9,7 @@ import java.io.InputStream
 
 object CountryHelper {
     fun getAllCountryes(context: Context): ArrayList<String> {
-        var tempArray = ArrayList<String>()
+        val tempArray = ArrayList<String>()
         try {
             val inputStreem: InputStream = context.assets.open("countriesToCities.json")
             val size: Int = inputStreem.available()
@@ -23,7 +23,7 @@ object CountryHelper {
                     tempArray.add(countryNames.getString(n))
                 }
             }
-        } catch (e: IOException) {
+        } catch (_: IOException) {
 
         }
         return tempArray
@@ -45,10 +45,10 @@ object CountryHelper {
         }
         return tempList
     }
-// countriesToCities.json
+
 
     fun getAllCities(country: String ,context: Context): ArrayList<String> {
-        var tempArray = ArrayList<String>()
+        val tempArray = ArrayList<String>()
         try {
             val inputStreem: InputStream = context.assets.open("countriesToCities.json")
             val size: Int = inputStreem.available()
@@ -61,7 +61,7 @@ object CountryHelper {
                     tempArray.add(cityNames.getString(n))
                 }
 
-        } catch (e: IOException) {
+        } catch (_: IOException) {
 
         }
         return tempArray

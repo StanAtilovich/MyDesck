@@ -1,7 +1,7 @@
 package ru.stan.mydesck.adapters
 
+import android.annotation.SuppressLint
 import android.graphics.Bitmap
-import android.net.Uri
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -34,6 +34,7 @@ class ImageAdapter : RecyclerView.Adapter<ImageAdapter.ImageHolder>() {
         }
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     fun update(newList: ArrayList<Bitmap>){
         mainArray.clear()
         mainArray.addAll(newList)

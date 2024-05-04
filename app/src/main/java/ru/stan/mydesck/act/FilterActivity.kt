@@ -2,7 +2,6 @@ package ru.stan.mydesck.act
 
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.view.MenuItem
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -12,7 +11,7 @@ import ru.stan.mydesck.dialogs.DialogSpinnerHelper
 import ru.stan.mydesck.utils.CountryHelper
 
 class FilterActivity : AppCompatActivity() {
-    lateinit var binding: ActivityFilterBinding
+    private lateinit var binding: ActivityFilterBinding
     private val dialog = DialogSpinnerHelper()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -108,7 +107,7 @@ class FilterActivity : AppCompatActivity() {
         return sBuilder.toString()
     }
 
-    fun actionBarSettiongs() {
+    private fun actionBarSettiongs() {
         val db = supportActionBar
         db?.setDisplayHomeAsUpEnabled(true)
     }

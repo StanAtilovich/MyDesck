@@ -2,7 +2,6 @@ package ru.stan.mydesck.adapters
 
 import android.annotation.SuppressLint
 import android.content.Intent
-import android.provider.Settings.Global.getString
 import android.view.LayoutInflater
 import android.view.View
 import android.view.View.OnClickListener
@@ -12,7 +11,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.squareup.picasso.Picasso
 import ru.stan.mydesck.MainActivity
 import ru.stan.mydesck.R
-import ru.stan.mydesck.act.DescriptionActivity
 import ru.stan.mydesck.act.EditAdsActivity
 import ru.stan.mydesck.databinding.AdListItemBinding
 import ru.stan.mydesck.model.Ad
@@ -21,8 +19,8 @@ import java.util.Calendar
 import java.util.Locale
 
 class AdsRcAdapter(val act: MainActivity) : RecyclerView.Adapter<AdsRcAdapter.AdHolder>() {
-    val arrayList = ArrayList<Ad>()
-    var timeFormater: SimpleDateFormat? = null
+    private val arrayList = ArrayList<Ad>()
+    private var timeFormater: SimpleDateFormat? = null
 
     init {
         timeFormater = SimpleDateFormat("dd/MM/yyyy - hh:mm:ss", Locale.getDefault())
@@ -63,9 +61,9 @@ class AdsRcAdapter(val act: MainActivity) : RecyclerView.Adapter<AdsRcAdapter.Ad
     }
 
     class AdHolder(
-        val binding: AdListItemBinding,
+        private val binding: AdListItemBinding,
         val act: MainActivity,
-        val formater: SimpleDateFormat
+        private val formater: SimpleDateFormat
     ) :
         RecyclerView.ViewHolder(binding.root) {
 

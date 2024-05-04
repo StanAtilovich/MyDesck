@@ -23,7 +23,7 @@ class ItemTouchMoveCallBack(val adapter: ItemTouchAdapter): ItemTouchHelper.Call
     }
 
     override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
-        TODO("Not yet implemented")
+
     }
 
     interface ItemTouchAdapter{

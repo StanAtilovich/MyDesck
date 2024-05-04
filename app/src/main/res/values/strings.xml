@@ -66,5 +66,11 @@
     <string name="thanks">Спасибо за покупку!</string>
     <string name="canseled">Не удалось совершить покупку!</string>
     <string name="remove_ads">Удалить рекламу</string>
+    <string name="sing_in_done">Sing in done!</string>
+    <string name="as_a_Guest">Вы вошли как гость!</string>
+    <string name="not_as_a_Guest">Вам не удалось войти как гость!</string>
+    <string name="failed_app">Ошибка: Подходящее приложение не найдено!</string>
+    <string name="open_with">Открыть с помощью!</string>
+    <string name="select_the_images_to_upload">Выберите изображения для загрузки</string>
 
 </resources>

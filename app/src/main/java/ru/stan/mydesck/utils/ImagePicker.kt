@@ -3,7 +3,6 @@ package ru.stan.mydesck.utils
 import android.graphics.Bitmap
 import android.net.Uri
 import android.view.View
-import androidx.fragment.app.Fragment
 import io.ak1.pix.helpers.PixEventCallback
 import io.ak1.pix.helpers.addPixToActivity
 import io.ak1.pix.models.Mode
@@ -17,8 +16,6 @@ import ru.stan.mydesck.act.EditAdsActivity
 
 object ImagePicker {
     const val MAX_IMAGE_COUNT = 3
-    const val REQUEST_CODE_GET_IMAGES = 999
-    const val REQUEST_CODE_GET_STRING_IMAGE = 998
     private fun getOptions(imageCounter: Int): Options {
         val options = Options().apply {
             count = imageCounter
@@ -85,7 +82,7 @@ object ImagePicker {
         }
     }
 
-    fun getMultiSelectImages(ediAct: EditAdsActivity, urls: List<Uri>) {
+    private fun getMultiSelectImages(ediAct: EditAdsActivity, urls: List<Uri>) {
 
         if (urls.size > 1 && ediAct.chooseImageFrag == null) {
             ediAct.openChooseImageFragment(urls as ArrayList<Uri>)

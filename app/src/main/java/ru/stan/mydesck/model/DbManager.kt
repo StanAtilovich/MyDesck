@@ -19,13 +19,13 @@ class DbManager {
     val dbStorage = Firebase.storage.getReference(MAIN_NODE)
 
     fun publishAdd(ad: Ad, finishWorkListener: FinishWorkListener) {
-        if (auth.uid != null) db.child(ad.key ?: "empty")
+        if (auth.uid != null) db.child(ad.key ?: EMPTY)
             .child(auth.uid!!).child(AD_NODE)
             .setValue(ad)
             .addOnCompleteListener {
 
                 val adFilter = FilterManager.createFilter(ad)
-                db.child(ad.key ?: "empty").child(FILTER_NODE)
+                db.child(ad.key ?: EMPTY).child(FILTER_NODE)
                     .setValue(adFilter)
                     .addOnCompleteListener {
                         finishWorkListener.onFinish(it.isSuccessful)
@@ -66,7 +66,7 @@ class DbManager {
     }
 
     fun getMyAds(readDataCallBack: ReadDataCallBack?) {
-        val query = db.orderByChild(auth.uid + "/ad/uid").equalTo(auth.uid)
+        val query = db.orderByChild(auth.uid + AD_UID).equalTo(auth.uid)
         readDataFromDb(query, readDataCallBack)
     }
 
@@ -263,7 +263,7 @@ class DbManager {
     fun adViewed(ad: Ad) {
         var counter = ad.viewCounter.toInt()
         counter++
-        if (auth.uid != null) db.child(ad.key ?: "empty")
+        if (auth.uid != null) db.child(ad.key ?: EMPTY)
             .child(INFO_NODE)
             .setValue(InfoItem(counter.toString(), ad.emailCounter, ad.callsCounter))
 
@@ -291,7 +291,7 @@ class DbManager {
         dbStorage.storage.getReferenceFromUrl(imageList[index]).delete().addOnCompleteListener {
             if (it.isSuccessful) {
                 if (imageList.size > index + 1) {
-                    if (imageList[index + 1] != "empty") {
+                    if (imageList[index + 1] != EMPTY) {
                         deleteImagesFromStorage(ad, index + 1, listener)
                     } else {
                         listener.onFinish(true)
@@ -320,6 +320,8 @@ class DbManager {
         const val ALL_TIME_NODE = "/adFilter/time"
         const val CAL_TIME_NODE = "/adFilter/cat_time"
         const val ADS_LIMIT = 2
+        const val AD_UID = "/ad/uid"
+        const val EMPTY = "empty"
     }
 
 }

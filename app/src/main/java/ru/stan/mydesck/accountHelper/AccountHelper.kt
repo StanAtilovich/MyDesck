@@ -15,12 +15,9 @@ import com.google.firebase.auth.GoogleAuthProvider
 import ru.stan.mydesck.MainActivity
 import ru.stan.mydesck.R
 import ru.stan.mydesck.constants.FireAuthConstance
-import ru.stan.mydesck.dialogHelper.GoogleAcCounst
-import java.lang.Exception
 
 
-class AccountHelper(act: MainActivity) {
-    private val act = act
+class AccountHelper(val act: MainActivity) {
     private lateinit var singInClient: GoogleSignInClient
     fun singUpWithEmail(email: String, password: String) {
         if (email.isNotEmpty() && password.isNotEmpty()) {
@@ -152,7 +149,7 @@ class AccountHelper(act: MainActivity) {
             if (task.isSuccessful) {
                 act.mAuth.signInWithCredential(credential).addOnCompleteListener { task2 ->
                     if (task2.isSuccessful) {
-                        Toast.makeText(act, "sing in done", Toast.LENGTH_LONG).show()
+                        Toast.makeText(act, act.getString(R.string.sing_in_done), Toast.LENGTH_LONG).show()
                         act.uiUpdate(task2.result.user)
                     } else {
                         Log.d("MyLog", "singInFirebaseWithGoogle EXCEPTION: ${task2.exception} ")
@@ -185,9 +182,9 @@ class AccountHelper(act: MainActivity) {
         act.mAuth.signInAnonymously().addOnCompleteListener { task ->
             if (task.isSuccessful) {
                 listener.onComplete()
-                Toast.makeText(act, "Вы вошли как гость", Toast.LENGTH_LONG).show()
+                Toast.makeText(act, act.getString(R.string.as_a_Guest), Toast.LENGTH_LONG).show()
             } else {
-                Toast.makeText(act, "Вам не удалось войти как Гость", Toast.LENGTH_LONG).show()
+                Toast.makeText(act, act.getString(R.string.not_as_a_Guest), Toast.LENGTH_LONG).show()
             }
         }
     }

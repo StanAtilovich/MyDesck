@@ -9,7 +9,7 @@ import androidx.recyclerview.widget.RecyclerView
 import ru.stan.mydesck.R
 
 
-class RcViewDialogSpinnerAdapter(var tvSelection: TextView, var dialog: AlertDialog) :
+class RcViewDialogSpinnerAdapter(private var tvSelection: TextView, private var dialog: AlertDialog) :
     RecyclerView.Adapter<RcViewDialogSpinnerAdapter.SpViewHolder>() {
     private val myList = ArrayList<String>()
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SpViewHolder {

@@ -1,16 +1,13 @@
 package ru.stan.mydesck.act
 
+import android.annotation.SuppressLint
 import android.content.ActivityNotFoundException
 import android.content.Intent
-import android.graphics.Bitmap
 import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.net.toUri
 import androidx.viewpager2.widget.ViewPager2
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import ru.stan.mydesck.R
 import ru.stan.mydesck.adapters.ImageAdapter
 import ru.stan.mydesck.databinding.ActivityDescriptionBinding
@@ -41,18 +38,20 @@ class DescriptionActivity : AppCompatActivity() {
         startActivity(iCall)
     }
 
+    @SuppressLint("ResourceType")
     private fun sendEmail() {
         val iSent = Intent(Intent.ACTION_SEND)
         iSent.type = "message/rfc822"
         iSent.apply {
             putExtra(Intent.EXTRA_EMAIL, arrayOf(ad?.email))
             putExtra(Intent.EXTRA_SUBJECT, "Обьявление")
-            putExtra(Intent.EXTRA_TEXT, " Меня интересует ваше обьявление!")
+            putExtra(Intent.EXTRA_TEXT, "Меня интересует ваше обьявление!")
+
         }
         try {
-            startActivity(Intent.createChooser(iSent, "Открыть с помощью"))
+            startActivity(Intent.createChooser(iSent, this.getString(R.string.open_with)))
         } catch (e: ActivityNotFoundException) {
-            Toast.makeText(this, "Ошибка: Подходящее приложение не найдено", Toast.LENGTH_SHORT)
+            Toast.makeText(this, this.getString(R.string.failed_app), Toast.LENGTH_SHORT)
                 .show()
         }
     }

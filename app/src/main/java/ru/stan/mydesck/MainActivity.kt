@@ -57,7 +57,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     private val dialogHelper = DialogHelper(this)
     val mAuth = Firebase.auth
     lateinit var googleSingInLauncher: ActivityResultLauncher<Intent>
-    lateinit var filterLauncher: ActivityResultLauncher<Intent>
+    private lateinit var filterLauncher: ActivityResultLauncher<Intent>
     private val firebaseViewModel: FirebaseViewModel by viewModels()
     val adapter = AdsRcAdapter(this)
     private var filterDb: String = ""
@@ -123,8 +123,6 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
                 if (it.resultCode == RESULT_OK) {
                     filter = it.data?.getStringExtra(FilterActivity.FILTER_KEY)!!
-                    // Log.d("MyLog", "Filter: $filter ")
-                    // Log.d("MyLog", "getFilter: ${FilterManager.getFilter(filter)} ")
                     filterDb = FilterManager.getFilter(filter)
                 } else if (it.resultCode == RESULT_CANCELED) {
                     filterDb = ""
@@ -172,7 +170,7 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
                             val i = Intent(this@MainActivity, EditAdsActivity::class.java)
                             startActivity(i)
                         } else {
-                            showToast(" Гость не может публиковать обьявления!")
+                            showToast("Гость не может публиковать обьявления!")
                         }
                     } else {
                         showToast("Ошибка регистрации")
